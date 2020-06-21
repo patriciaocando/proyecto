@@ -1,5 +1,6 @@
 users (#id, name, last_name, email, profile_bio, avatar, username, password, expert_validation)
 languages_techs(#id, name, description, image)
 questions(#id, title, question_text, date_creation, status_question, -id_user, -id_language)
-anwers(#id, answer, rating, date, -id_question, -id_user)
+anwers(#id, answer_text, dateAnswer, -id_question, -id_user)
+users_rating(#[-id_user, -id_rating],rating)
 users_languages(#[-id_user, -id_language])

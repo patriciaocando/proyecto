@@ -1,5 +1,3 @@
-USE bbdd_proyecto;
-
 CREATE TABLE users (
 	id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     name_user VARCHAR(50),
@@ -39,8 +37,8 @@ CREATE TABLE questions (
 
 CREATE TABLE answers (
 	id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    answer_text VARCHAR(500),
-    rating INT,
+    answer_text VARCHAR(800),
+    dateAnswer DATETIME
     id_question INT UNSIGNED,
     FOREIGN KEY (id_question) REFERENCES questions (id),
     id_user_expert INT UNSIGNED,
@@ -48,6 +46,19 @@ CREATE TABLE answers (
 	creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_date DATETIME
 );
+
+
+CREATE TABLE users_rating (
+ 	id_user INT UNSIGNED,
+    FOREIGN KEY (id_user) REFERENCES users (id),
+    id_rating INT UNSIGNED,
+    FOREIGN KEY (id_rating) REFERENCES answers (id),
+    PRIMARY KEY (id_user, id_rating),
+    rating INT,
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_date DATETIME
+);
+
 
 CREATE TABLE users_languages (
 	id_user INT UNSIGNED,
