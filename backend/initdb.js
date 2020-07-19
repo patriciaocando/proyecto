@@ -42,7 +42,7 @@ async function main() {
 
     await connection.query(`CREATE TABLE languages_tech (
 	id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    name_language ENUM('Javascript','CSS','HTML','Java','PHP','SQL','Angular','Vue', 'NodeJS'),
+    name_language VARCHAR(100) NOT NULL,
     description VARCHAR(200),
     image VARCHAR(200),
     update_date DATETIME,
@@ -320,7 +320,7 @@ async function main() {
 
         await connection.query(`
         INSERT INTO users_rating(id_user, id_answer, rating, update_date, creation_date)
-        VALUES("${radomUserRating}","${answerId[0]}",
+        VALUES("${radomUserRating}","${answerId[0].id}",
         "${randomVote}", UTC_TIMESTAMP,UTC_TIMESTAMP)
         `);
 

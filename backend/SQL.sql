@@ -20,7 +20,7 @@ CREATE TABLE users (
 
 CREATE TABLE languages_tech (
 	id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    name_language ENUM('Javascript','CSS','HTML','Java','PHP','SQL','Angular','Vue', 'NodeJS'),
+    name_language VARCHAR(100) NOT NULL,
     description VARCHAR(200),
     image VARCHAR(200),
     update_date DATETIME,

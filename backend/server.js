@@ -62,6 +62,8 @@ const deleteUser = require("./controllers/users/deleteUser");
 //Controllers Languages
 const getLanguages = require("./controllers/languages/getLanguages");
 const postNewLanguage = require("./controllers/languages/postNewLanguage");
+const editLanguage = require("./controllers/languages/editLanguage");
+const deleteLanguage = require("./controllers/languages/deleteLanguage");
 
 //ENDPOINTS - QUESTIONS --------------------------------------//
 //Lista todas las preguntas //Filtrar preguntas ✅
@@ -224,7 +226,20 @@ app.get("/languages", getLanguages);
  */
 //crear nuevo lenguage
 //solo administrador //post
-//app.post("/languages/new-language", isUser, isAdmin, postNewLanguage);
+app.post("/languages/new-language", isUser, isAdmin, postNewLanguage);
+
+//Editar lenguaje
+//solo administrador //put
+app.put("/languages/edit-language/:id_language", isUser, isAdmin, editLanguage);
+
+//Borrar lenguaje
+//solo administrador //delete
+app.delete(
+  "/languages/delete-language/:id_language",
+  isUser,
+  isAdmin,
+  deleteLanguage
+);
 
 //-----------------------------------//
 //MIDDLEWARE ERRORES
