@@ -24,4 +24,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+#nav {
+  background-color: var(--ligthColor);
+  display: flex;
+}
+</style>

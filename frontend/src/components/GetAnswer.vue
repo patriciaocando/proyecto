@@ -1,31 +1,38 @@
 <template>
   <div>
     <div v-for="answer in answers" :key="answer.id">
-      <div class="autorInfo">
-        <img class="avatar" :src="getImageName(answer.avatarExpert)" />
-        <p>{{ answer.expert }}</p>
-      </div>
-      <p>{{ answer.answer }}</p>
-      <p>
-        respondida: {{ getFormat(answer.respond) }} | Hace:
-        {{ getDistance(answer.respond) }}
-      </p>
-      <div
-        @mouseleave="showCurrentRating(0)"
-        @click="getAnswerId(answer.id)"
-        style="display:inline-block;"
-      >
-        <star-rating
-          :rating="parseInt(answer.rating)"
-          @current-rating="showCurrentRating"
-          @rating-selected="setCurrentSelectedRating"
-          :increment="1"
-          :max-rating="5"
-          inactive-color="var(--regularColor)"
-          active-color="var(--principalColor)"
-          :star-size="20"
-        ></star-rating>
-        <p>{{ answer.total_votes }}</p>
+      <div class="answrContainer">
+        <div class="exepertInfo">
+          <img class="avatar" :src="getImageName(answer.avatarExpert)" />
+          <p>{{ answer.expert }}</p>
+        </div>
+
+        <p>{{ answer.answer }}</p>
+        <div class="metaDataAnswr">
+          <h4>
+            {{ getFormat(answer.respond) }} | Hace:
+            {{ getDistance(answer.respond) }}
+          </h4>
+
+          <div
+            class="ratingStyle"
+            @mouseleave="showCurrentRating(0)"
+            @click="getAnswerId(answer.id)"
+            style="display:inline-block;"
+          >
+            <star-rating
+              :rating="parseInt(answer.rating)"
+              @current-rating="showCurrentRating"
+              @rating-selected="setCurrentSelectedRating"
+              :increment="1"
+              :max-rating="5"
+              inactive-color="var(--regularColor)"
+              active-color="var(--blue)"
+              :star-size="20"
+            ></star-rating>
+          </div>
+          <!-- <h4>({{ answer.total_votes -1 }})</h4> -->
+        </div>
       </div>
     </div>
   </div>
@@ -76,4 +83,41 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.answrContainer {
+  margin: 1rem 0;
+  background-color: white;
+  padding: 1rem;
+  -webkit-box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
+  -moz-box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
+  box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
+}
+.exepertInfo {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.metaDataAnswr {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: stretch;
+  align-items: flex-start;
+  margin: 1rem 0;
+}
+
+@media only screen and (min-width: 600px) {
+  .metaDataAnswr {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+  }
+}
+@media only screen and (min-width: 1200px) {
+}
+</style>

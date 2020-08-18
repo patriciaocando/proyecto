@@ -4,14 +4,21 @@ const Swal = require("sweetalert2");
 
 export const ENDPOINT = "http://localhost:3000";
 
-export async function login(email, password) {
-  let data = {
-    email,
-    password,
-  };
-  const response = await axios.post(`${ENDPOINT}/users/login`, data);
-  setAuthToken(response.data.data);
-}
+/* export async function login(email, password) {
+  try {
+    let data = {
+      email,
+      password,
+    };
+    const response = await axios.post(`${ENDPOINT}/users/login`, data);
+    setAuthToken(response.data.data);
+  } catch (error) {
+    console.log(err.response.status);
+    if (err.response.status === 404) {
+      alert(err.response.data.message);
+    }
+  }
+} */
 
 //OBJETO CONFIG
 export const config = {
@@ -72,7 +79,7 @@ export function tokenValidation(token) {
 //COMPROBAR SI LA PERSONA ESTA LOGUEADA
 export function isLoggedIn() {
   let authToken = getAuthToken();
-  return !!authToken && !tokenData(authToken);
+  return !!authToken && !tokenValidation(authToken);
 }
 
 //LOGOUT

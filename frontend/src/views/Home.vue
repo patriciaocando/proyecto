@@ -7,12 +7,13 @@
       :languages="languages"
     />
 
-    <button>
+    <!--  <button>
       <router-link :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
     </button>
-
+    -->
     <p v-show="showError">{{ errorMessage }}</p>
     <showquestions
+      id="questionsBody"
       :questions="questions"
       :answers="answers"
       v-on:showAnswers="getAnswers"
@@ -141,4 +142,28 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#questionsBody {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+h1 {
+  margin-bottom: 2rem;
+}
+
+@media only screen and (min-width: 600px) {
+  #questionsBody {
+    width: 90vw;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: space-around;
+    margin: 0 auto;
+  }
+}
+/*@media only screen and (min-width: 1200px) {
+} */
+</style>

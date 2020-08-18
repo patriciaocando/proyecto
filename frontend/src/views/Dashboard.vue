@@ -1,76 +1,71 @@
 <template>
   <div>
-    <!--MENUS-->
-    <div v-if="role === 'experto'">
-      <menuexpert />
-    </div>
-
-    <div v-if="role === 'estudiante'">
-      <menustudent />
-    </div>
-
     <!--ELEMENTOS COMUNES-->
-    <div>
-      <h4>¡HOLA!</h4>
-      <p>{{username}}</p>
+    <div class="dashHomeContent">
       <!--COMPONENTE DE BUSQUEDA-->
-      <searchcomponent v-on:queryParams="collectParams" :languages="languages" />
-      <!--NUEVA PREGUNTA-->
-      <button>
-        <router-link :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
-      </button>
+      <div class="searchContainer">
+        <h3>BIENVENIDO</h3>
+        <h1>Encuentra todas las respuestas que necesitas</h1>
+        <searchcomponent class="search" v-on:queryParams="collectParams" :languages="languages" />
+      </div>
       <!--GESTION DE ERRORES-->
       <p v-show="showError">{{ errorMessage }}</p>
       <!--MOSTRAR LOS RESULTADOS DE LA BUSQUEDA-->
       <div v-show="showResultSearch">
         <getquestions :questions="questionsResultSearch" />
       </div>
-    </div>
 
-    <!--VISTA EXPERTO-->
-    <div v-if="role === 'experto'">
-      <h3>EXPERTO</h3>
-      <showquestionstoexpert
-        v-show="allQuestions"
-        :questions="questionsToExpert"
-        v-on:getQuestion="getQuestion"
-      />
-      <answerquestion
-        v-show="!allQuestions"
-        :question="question"
-        v-on:publishAnswer="publishAnswer"
-        v-on:cancelEdition="cancelEdition"
-      />
-    </div>
-
-    <!--VISTA ADMIN-->
-
-    <!--VISTA ESTUDIANTE-->
-    <div v-show="role === 'estudiante'">
-      <div>
-        <h3>ACTIVIDAD RECIENTE</h3>
-        <ShowQuestionsAnswer
-          :questions="studentQuestions"
-          :answer="studentAnswers"
-          :count="count"
-          v-on:questionData="getQuestionData"
-          v-show="showQuestion"
+      <!--VISTA EXPERTO-->
+      <div v-if="role === 'experto'">
+        <h3>EXPERTO</h3>
+        <showquestionstoexpert
+          v-show="allQuestions"
+          :questions="questionsToExpert"
+          v-on:getQuestion="getQuestion"
         />
-        <div v-show="noQuestions">
-          <p>¡Haz tu primera pregunta!</p>
-        </div>
+        <answerquestion
+          v-show="!allQuestions"
+          :question="question"
+          v-on:publishAnswer="publishAnswer"
+          v-on:cancelEdition="cancelEdition"
+        />
       </div>
-      <!--EDITAR PREGUNTA-->
-      <div v-show="hideQuestion">
-        <h2>EDITAR PREGUNTA:</h2>
-        <h3>TITULO:</h3>
-        <input type="text" :placeholder="title" v-model="title" />
-        <textarea type="text" name="textQuestion" rows="4" :placeholder="content" v-model="content"></textarea>
-        <p v-show="showError">{{ errorMessage }}</p>
-        <button @click="deleteQuestion()">Borrar pregunta</button>
+
+      <!--VISTA ADMIN-->
+
+      <!--VISTA ESTUDIANTE-->
+      <div v-show="role === 'estudiante'">
         <div>
-          <button @click="saveEdition()">GUARDAR</button>
-          <button class="cancelButton" @click="cancelEdition()">CANCELAR</button>
+          <h3>ACTIVIDAD RECIENTE</h3>
+          <ShowQuestionsAnswer
+            :questions="studentQuestions"
+            :answer="studentAnswers"
+            :count="count"
+            v-on:questionData="getQuestionData"
+            v-show="showQuestion"
+          />
+          <div v-show="noQuestions">
+            <p>¡Haz tu primera pregunta!</p>
+          </div>
+        </div>
+        <!--EDITAR PREGUNTA-->
+        <div v-show="hideQuestion">
+          <h2>EDITAR PREGUNTA:</h2>
+          <h3>TITULO:</h3>
+          <input type="text" :placeholder="title" v-model="title" />
+          <textarea
+            type="text"
+            name="textQuestion"
+            rows="4"
+            :placeholder="content"
+            v-model="content"
+          ></textarea>
+          <p v-show="showError">{{ errorMessage }}</p>
+          <button @click="deleteQuestion()">Borrar pregunta</button>
+          <div>
+            <button @click="saveEdition()">GUARDAR</button>
+            <button class="cancelButton" @click="cancelEdition()">CANCELAR</button>
+          </div>
         </div>
       </div>
     </div>
@@ -78,9 +73,6 @@
 </template>
 
 <script>
-//COMPONENTES DE MENUS
-import menuexpert from "@/components/MenuExpert.vue";
-import menustudent from "@/components/MenuStudent";
 //COMPONENTES DE BUSQUEDA
 import searchcomponent from "@/components/SearchComponent.vue";
 import getquestions from "@/components/GetQuestions.vue";
@@ -105,8 +97,6 @@ import {
 export default {
   name: "HomeExpert",
   components: {
-    menuexpert,
-    menustudent,
     getquestions,
     searchcomponent,
     showquestionstoexpert,
@@ -119,7 +109,7 @@ export default {
       role: "",
       idUserLoged: "",
       username: "",
-      avatar: "",
+
       //Variable para interpolar los lenguages en la busqueda
       languages: [],
       //Variable estudiante
@@ -152,10 +142,8 @@ export default {
   methods: {
     //////////////////////////////////////////////////////
     //ENPOINTS GENERALES
-    //OBTENGO EL ROL PARA SABER QU LE VA A MOSTRAR AL USUARIO SEGUN SU ROL
+    //OBTENGO EL ROL PARA SABER QUE LE VA A MOSTRAR AL USUARIO SEGUN SU ROL
     async getRole(token) {
-      console.log(this.token);
-      /* this.token = getAuthToken(); */
       this.role = await getRoleToken(this.token);
       this.idUserLoged = await getIdToken(this.token);
       await this.getUserProfile();
@@ -179,7 +167,6 @@ export default {
 
         this.username = response.data.data.username;
         this.avatar = process.env.VUE_APP_STATIC + response.data.data.avatar;
-        console.log(this.avatar);
       } catch (error) {
         this.showError = true;
         this.errorMessage = error.response.data.message;
@@ -360,4 +347,29 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.dashHomeContent {
+  margin: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: flex-start;
+}
+.searchContainer {
+  background-color: var(--ligthBlue);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: baseline;
+  padding: 2rem;
+  border-radius: 1rem;
+}
+.searchContainer h3,
+.searchContainer h1 {
+  margin-bottom: 1rem;
+}
+.search {
+  width: 50vw;
+}
+</style>

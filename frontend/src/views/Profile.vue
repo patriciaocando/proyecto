@@ -47,7 +47,7 @@ export default {
       userId: "",
 
       //TOKEN
-      token: getAuthToken(),
+      token: "",
     };
   },
 
@@ -83,6 +83,7 @@ export default {
     },
     //TRAIGO LA INFO DEL PERFIL DE USUARIO DE LA BBDD
     async getUserProfile() {
+      this.token = getAuthToken();
       try {
         this.userId = getIdToken(this.token);
         const response = await axios.get(

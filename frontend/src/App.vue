@@ -1,24 +1,23 @@
 <template>
   <div id="app">
-    <menucustom />
-    <!--     <h1>Titulos principales h1</h1>
-    <h2>Titulos principales h2</h2>
-    <h3>Titulos principales h3</h3>
-    <h4>Titulos principales h4</h4>
-    <p>Titulos textos</p>
-    <p class="auxiliares">Titulos principales h1</p>-->
-    <router-view class="body1" />
+    <component :is="layout">
+      <router-view />
+    </component>
   </div>
 </template>
 
 <script>
 //IMPORTO MENU
-import menucustom from "@/components/MenuCustom.vue";
+//import menucustom from "@/components/MenuCustom.vue";
+const publicLayout = "public";
 
 export default {
   name: "App",
-  components: {
-    menucustom,
+  components: {},
+  computed: {
+    layout() {
+      return (this.$route.meta.layout || publicLayout) + "-layout";
+    },
   },
 };
 </script>
@@ -28,93 +27,80 @@ export default {
 
 * {
   margin: 0;
+  /*COLORS*/
   --blue: #337eff;
   --ligthBlue: #e6efff;
   --vibrantBLue: #33ddff;
   --ligthColor: #f8f8f8;
   --regularColor: #dedede;
-  --mediumColor: #828282;
+  --mediumColor: #7e7e7e;
   --textColor: #5a5a5a;
   --darkColor: #3d3d3d;
-  --letterSpacing: 0.25rem;
-}
-.body1 {
-  margin: 0 2rem;
+  --red: #b32009;
+  --js: #fff07a;
+  --jsf: #463e00;
+
+  /*FONTS*/
+  --ligth: 300;
+  --regular: 400;
+  --semiBold: 600;
+  --bold: 700;
+  --extraBold: 800;
 }
 
-router-link {
-  text-decoration: none;
-}
 #app {
   font-family: "Open Sans", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: var(--textColor);
+  font-weight: var(--semiBold);
+  line-height: 1.4rem;
 }
 
 h1 {
-  font-style: bold;
   font-size: 1.6rem;
   line-height: 2rem;
   letter-spacing: 0.03rem;
   color: var(--darkColor);
 }
 
-h3 {
-  font-style: bold;
-  font-size: 1rem;
-  line-height: 1.2rem;
-  letter-spacing: 0.03rem;
-  color: var(--darkColor);
-  text-transform: uppercase;
-}
 h2 {
-  font-style: bold;
-  font-size: 1.3rem;
+  font-style: var(--bold);
+  font-size: 1.2rem;
   line-height: 1.8rem;
   letter-spacing: 0.02rem;
   color: var(--darkColor);
 }
 
-h5 {
-  font-style: regular;
-  font-size: var(--unnamed-font-size-12);
-  line-height: var(--unnamed-line-spacing-17);
-  letter-spacing: var(--unnamed-character-spacing-0-12);
-  color: var(--mediumgrey);
+h3 {
+  font-weight: var(--bold);
+  font-size: 0.8rem;
+  line-height: 1.2rem;
+  letter-spacing: 0.03rem;
+  color: var(--darkColor);
+  text-transform: uppercase;
 }
-.accesibilidad {
-  font-family: var(--unnamed-font-family-open-sans);
-  font-style: var(--unnamed-font-style-regular);
-  font-size: var(--unnamed-font-size-12);
-  line-height: var(--unnamed-line-spacing-17);
-  letter-spacing: var(--unnamed-character-spacing-0-12);
-  color: var(--textcolor);
+h4 {
+  font-weight: var(--regular);
+  font-size: 1rem;
+  line-height: 22px;
+  color: var(--mediumColor);
 }
-.textparrafo {
-  font-family: var(--unnamed-font-family-open-sans);
-  font-style: var(--unnamed-font-style-regular);
-  font-size: var(--unnamed-font-size-14);
-  line-height: var(--unnamed-line-spacing-24);
-  letter-spacing: var(--unnamed-character-spacing-0-14);
-  color: var(--textcolor);
+
+.accesibilityTxt {
+  font-weight: var(--semiBold);
+  font-size: 0.8rem;
+  letter-spacing: 0.12px;
+  color: var(--textColor);
 }
-.placeholdertext {
-  font-family: var(--unnamed-font-family-open-sans);
-  font-style: var(--unnamed-font-style-regular);
-  font-size: var(--unnamed-font-size-14);
-  line-height: var(--unnamed-line-spacing-21);
-  letter-spacing: var(--unnamed-character-spacing-0-14);
-  color: var(--unnamed-color-acacac);
-}
-.h4 {
-  font-family: var(--unnamed-font-family-open-sans);
-  font-style: var(--unnamed-font-style-regular);
-  font-size: var(--unnamed-font-size-16);
-  line-height: var(--unnamed-line-spacing-22);
-  letter-spacing: var(--unnamed-character-spacing-0-16);
-  color: var(--mediumgrey);
+
+.errorTxt {
+  font-weight: var(--semiBold);
+  font-size: 0.8rem;
+  line-height: 17px;
+  letter-spacing: 0.12px;
+  color: var(--red);
 }
 
 .avatar {
@@ -122,29 +108,128 @@ h5 {
   height: 48px;
   border-radius: 24px;
   margin: 0.5rem;
+  margin-right: 0.5rem;
 }
 
-.accesibilityTxt {
-  color: darkgrey;
-}
 button {
-  /* display: block; */
-  background-color: var(--blue);
+  /*texto*/
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06rem;
+  font-weight: var(--semiBold);
   color: white;
+  /*fondo*/
   border: none;
   text-decoration: none;
-  padding: 0.5rem 2rem;
-  margin: 1rem;
   border-radius: 0.25rem;
+  background-color: var(--blue);
+  /*separacion*/
+  padding: 1rem 1.5rem;
+  margin: 1rem 0.5rem;
 }
+
+#button2 {
+  background-color: var(--ligthBlue);
+  color: var(--blue);
+}
+
+#button3 {
+  color: var(--darkColor);
+  background-color: white;
+  margin: 0.5rem;
+  padding: 0.5rem;
+}
+
 .cancelButton {
   background-color: white;
   color: var(--mediumColor);
-  border: none;
+}
+
+.simpleLink {
   text-decoration: none;
-  padding: 0.5rem 2rem;
-  margin: 1rem;
-  border-radius: 0.25rem;
+  color: var(--blue);
+  text-transform: uppercase;
+  font: 0.7rem var(--regular);
+  letter-spacing: 0.08rem;
+}
+
+input {
+  padding: 0.4rem 0.5rem;
+  height: 1.2rem;
+  border: 1px solid var(--regularColor);
+  margin: 0.5rem 0.5rem;
+  border-radius: 4px;
+  background-color: white;
+}
+
+input:focus {
+  outline: none;
+  border-radius: 4px;
+}
+
+.languageStyle {
+  background-color: var(--mediumColor);
+  color: var(--ligthColor);
+  font-size: 12px;
+  font-weight: var(--semiBold);
+  text-align: center;
+  letter-spacing: 0.24px;
+  max-width: 56px;
+  padding: 0.2rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 4px;
+}
+
+.javascript {
+  background-color: var(--js);
+  color: var(--jsf);
+}
+.css3 {
+  background-color: #96d1fb;
+  color: #0b6cb1;
+}
+
+.html {
+  color: white;
+  background-color: #e65a22;
+}
+
+.java {
+  color: #e65a22;
+  background-color: white;
+}
+
+.vue {
+  color: #35495e;
+  background-color: #41b883;
+}
+
+.node {
+  color: #404137;
+  background-color: #83cd29;
+}
+
+.angular {
+  color: white;
+  background-color: #dd1b16;
+}
+
+.php {
+  color: white;
+  background-color: #4f5b93;
+}
+
+.sql {
+  color: white;
+  background-color: #157efb;
+}
+
+@media only screen and (min-width: 600px) {
+  .languageStyle {
+    margin: 0.5 0rem;
+  }
+}
+@media only screen and (min-width: 1200px) {
 }
 
 /* @media only screen and (max-width:600px)

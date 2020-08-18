@@ -1,37 +1,42 @@
 <template>
   <div>
-    <div class="questionInfo" v-for="(question, index) in questions" :key="question.id">
-      <!--AUTOR DE LA PREGUNTA-->
-      <div class="autorInfo">
-        <img class="avatar" :src="getImageName(question.avatar)" />
-        <p>{{ question.name_user }}</p>
-      </div>
-      <h3>{{ question.title }}</h3>
-      <!--METADATA FECHA-->
-      <span>
-        <p>
-          Formulada: {{ getFormat(question.date) }} | Hace:
-          {{ getDistance(question.date) }}
-        </p>
-        <p>{{ question.name_language }}</p>
-      </span>
-      <!--CONTENIDO PREGUNTA-->
-      <p>{{ question.question_text }}</p>
-      <!--METADATA RESPUESTAS-->
-      <div>
-        <p>
-          ID {{ question.id }} RESPUESTAS
-          <b>{{ question.answers }}</b>
+    <div class="questionContent">
+      <div class="questionInfo" v-for="(question, index) in questions" :key="question.id">
+        <!--AUTOR DE LA PREGUNTA-->
+        <div class="autorInfo">
+          <img class="avatar" :src="getImageName(question.avatar)" />
+          <p>{{ question.name_user }}</p>
+        </div>
+        <h3>{{ question.title }}</h3>
+        <!--METADATA FECHA-->
+
+        <span class="dataMeta">
+          <p class="accesibilityTxt">
+            Formulada: {{ getFormat(question.date) }} | Hace:
+            {{ getDistance(question.date) }}
+          </p>
+          <p
+            :class="'languageStyle ' + question.name_language.toLowerCase()"
+          >{{ question.name_language }}</p>
+        </span>
+        <!--CONTENIDO PREGUNTA-->
+        <p class="lengthTxt">{{ question.question_text }}</p>
+        <!--METADATA RESPUESTAS-->
+        <div class="answerMeta">
+          <h3>
+            RESPUESTAS
+            <b class="numberQuestions">{{ question.answers }}</b>
+          </h3>
           <button
             v-show="isUser"
             :class="{ hideButton: question.answers <= 0 }"
             @click="sendQuestionId(question.id, index)"
-          >VER RESPUESTAS</button>
-        </p>
-      </div>
-      <!--MOSTRAR LAS RESPUESTAS-->
-      <div v-if="index === answer">
-        <getanswer class="answerContent" :answers="answers" v-on:newVote="getRating" />
+          >{{buttonText}}</button>
+        </div>
+        <!--MOSTRAR LAS RESPUESTAS-->
+        <div v-show="hideAnswer" class="answerContent" v-if="index === answer">
+          <getanswer :answers="answers" v-on:newVote="getRating" />
+        </div>
       </div>
     </div>
   </div>
@@ -58,16 +63,20 @@ export default {
       idQuestion: 2,
       hideAnswers: true,
       seeAnswersButton: false,
+      hideAnswer: true,
       //variable para ocultar boton si no esta autenticado el usuario
       isUser: "",
 
       //Variable para saber el indice de la pregunta de la que se desea ver la respuesta
       answer: "",
+      buttonText: "VER RESPUESTAS",
 
       //TOKEN
       token: getAuthToken(),
     };
   },
+  computed: {},
+
   methods: {
     getRating(data) {
       this.$emit("rateAnswer", data);
@@ -80,6 +89,13 @@ export default {
       }
     },
     sendQuestionId(id, index) {
+      //this.hideAnswer = !this.hideAnswer;
+      if (this.hideAnswer === false) {
+        this.buttonText = "OCULTAR RESPUESTAS";
+      } else {
+        this.buttonText = "VER RESPUESTAS";
+      }
+      this.hideAnswer = !this.hideAnswer;
       this.answer = index;
       this.$emit("showAnswers", id);
     },
@@ -118,13 +134,19 @@ export default {
 </script>
 
 <style scoped>
+/* * {
+  margin: 0;
+} */
+.lengthTxt {
+  word-break: break-word;
+}
+
+.numberQuestions {
+  color: var(--blue);
+}
+
 .hideButton {
   display: none;
-}
-.answerContent {
-  margin: 2rem;
-  border: solid 1px darkgrey;
-  padding: 1rem;
 }
 
 .hideQuestion {
@@ -132,10 +154,45 @@ export default {
 }
 .questionInfo {
   text-align: left;
+  background-color: var(--ligthColor);
+  padding: 1rem 1.5rem;
+  margin: 1rem;
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
 }
 
+.dataMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0.5rem 0;
+}
+
+.answerMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+}
 .autorInfo {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+@media only screen and (min-width: 600px) {
+  .answerMeta {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+}
+@media only screen and (min-width: 1200px) {
+  .questionContent {
+    width: 75vw;
+  }
 }
 </style>

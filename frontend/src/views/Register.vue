@@ -1,14 +1,22 @@
 <template>
-  <div>
+  <div class="allContent">
     <vue-headful title="¡Regístrate! | TutorShip" description="Registro en TutorShip" />
-    <div>
+    <div class="backgroundImage">
       <!--DIV PARA COLOCAR LA IMAGEN DE TUTORSHIPS-->
     </div>
 
-    <div>
-      <img src="../assets/logoTutorShips.png" />
+    <div class="registerContent" v-show="registerShow">
+      <figure>
+        <img
+          class="logoTutor"
+          src="../assets/logoTutorShips.png"
+          alt="logo-tutorships"
+          @click="$router.push('/')"
+        />
+      </figure>
+
       <!-- FORMULARIO DE REGISTRO -->
-      <div v-show="registerShow">
+      <div class="registerInputs">
         <h3>EMAIL:</h3>
         <input type="email" v-model="email" placeholder="miemail@tutorships.com" />
         <h3>NOMBRE DE USUARIO:</h3>
@@ -27,14 +35,24 @@
         <h3>REPITE LA CONTRASEÑA:</h3>
         <input type="password" v-model="confirmpassword" placeholder="*******" />
 
-        <p class="accesibilityTxtalert" v-show="showError">{{ errorMessage }}</p>
-        <button class="cancelButton" @click="cancelAction()">Cancelar</button>
-        <button @click="registerUser()">¡Registrarme!</button>
+        <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
+        <div class="buttonsContent">
+          <button @click="registerUser()">¡Registrarme!</button>
+          <button class="cancelButton" @click="cancelAction()">Cancelar</button>
+          <div class="loginContent">
+            <p>¿Ya tienes cuenta?</p>
+            <button id="button3" @click="$router.push('/login')">¡Inicia sesión!</button>
+          </div>
+        </div>
       </div>
-      <!-- DIV REVISA TU EMAL -->
-      <div v-show="registerHide">
-        <h1>¡Revisa tu email!</h1>
-      </div>
+    </div>
+    <!-- DIV REVISA TU EMAL -->
+    <div class="registerAlert" v-show="validationShow">
+      <figure>
+        <img src="../assets/logoTutorShips.png" alt="logo-tutorships" />
+      </figure>
+      <h1>¡Revisa tu email!</h1>
+      <button @click="$router.push('/login')">IR AL login</button>
     </div>
   </div>
 </template>
@@ -56,7 +74,8 @@ export default {
 
       //variables de vista
       registerShow: true,
-      registerHide: false,
+      validationShow: false,
+
       validationUrl: "",
       coment: false,
       comentPass: false,
@@ -87,8 +106,11 @@ export default {
 
       if (this.password !== this.confirmpassword) {
         this.showError = true;
-        this.errorMessage = "Tus contraseña debe coincidir";
+        this.errorMessage = "Tus contraseñas deben coincidir";
       } else {
+        this.comentPass = false;
+        this.coment = false;
+
         try {
           const response = await axios.post(
             ENDPOINT + "/new-user",
@@ -103,8 +125,8 @@ export default {
             `Confirma tu email ${this.email} para activar tu cuenta en Tutorships.
           Recuerda revisar un carpeta de SPAM`
           );
+          this.validationShow = true;
           this.registerShow = false;
-          this.registerHide = true;
         } catch (error) {
           console.log(error);
           this.showError = true;
@@ -122,4 +144,128 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+* {
+  margin: 0;
+}
+.backgroundImage {
+  display: none;
+}
+
+figure {
+  display: flex;
+}
+.logoTutor {
+  margin: 2rem 0;
+}
+.allContent {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  align-items: stretch;
+  margin: 2rem;
+}
+
+.registerContent h3,
+.registerContent input {
+  margin-top: 1rem;
+}
+
+.registerInputs {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.buttonsContent {
+  display: flex;
+  flex-direction: column;
+  margin: 2rem 0;
+}
+
+.loginContent {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 1rem;
+}
+
+.registerAlert {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.registerAlert h1 {
+  margin: 2rem;
+}
+
+@media only screen and (min-width: 600px) {
+  * {
+    margin: 0;
+  }
+  .logoTutor {
+    margin: 2rem 0;
+  }
+  .backgroundImage {
+    display: flex;
+    height: 100vh;
+    background-image: url("../assets/register-IMG-tablet.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 64px;
+  }
+
+  .allContent {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center; /*centra verticalmente*/
+    align-content: center;
+    margin: 0 auto;
+    height: 100vh;
+  }
+  .registerContent {
+    flex-grow: 1;
+    max-width: 40vh;
+    margin: 0 auto;
+  }
+  .registerAlert {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center; /*centra verticalmente*/
+    margin: 0 auto;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .backgroundImage {
+    display: flex;
+    height: 100vh;
+    width: 55vw;
+    background-image: url("../assets/register-IMG-desk.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  .registerAlert {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center; /*centra verticalmente*/
+    align-content: center;
+    margin: 0 auto;
+  }
+}
+</style>

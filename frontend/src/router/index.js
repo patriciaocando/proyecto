@@ -36,6 +36,7 @@ const routes = [
     component: () => import("../views/Login.vue"),
     meta: {
       allowAll: true,
+      layout: "blank",
     },
   },
   {
@@ -44,6 +45,7 @@ const routes = [
     component: () => import("../views/Register.vue"),
     meta: {
       allowAll: true,
+      layout: "blank",
     },
   },
   {
@@ -55,11 +57,12 @@ const routes = [
     },
   },
   {
-    path: "/profile",
+    path: "/perfil",
     name: "Profile",
     component: () => import("../views/Profile.vue"),
     meta: {
       allowAll: false,
+      layout: "dashboard",
     },
   },
   {
@@ -68,6 +71,7 @@ const routes = [
     component: () => import("../views/NewQuestion.vue"),
     meta: {
       allowAll: false,
+      layout: "dashboard",
     },
   },
   {
@@ -76,6 +80,7 @@ const routes = [
     component: () => import("../views/UserQuestions.vue"),
     meta: {
       allowAll: false,
+      layout: "dashboard",
     },
   },
   {
@@ -84,6 +89,7 @@ const routes = [
     component: () => import("../views/BecomeExpert.vue"),
     meta: {
       allowAll: false,
+      layout: "blank",
     },
   },
   {
@@ -102,6 +108,7 @@ const routes = [
     meta: {
       allowAll: false,
       onlyAdmin: true,
+      layout: "blank",
     },
     beforeEnter: (to, from, next) => {
       let token = getAuthToken();
@@ -121,6 +128,7 @@ const routes = [
     component: () => import("../views/UserAnswers.vue"),
     meta: {
       allowAll: false,
+      layout: "dashboard",
     },
   },
   {
@@ -129,6 +137,7 @@ const routes = [
     component: () => import("../views/ExpertLanguages.vue"),
     meta: {
       allowAll: false,
+      layout: "dashboard",
     },
   },
 
@@ -138,6 +147,7 @@ const routes = [
     component: () => import("../views/Dashboard.vue"),
     meta: {
       allowAll: false,
+      layout: "dashboard",
     },
   },
   {
@@ -146,6 +156,7 @@ const routes = [
     component: () => import("../views/RecoverPassword.vue"),
     meta: {
       allowAll: false,
+      layout: "blank",
     },
   },
 ];
