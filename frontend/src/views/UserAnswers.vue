@@ -1,22 +1,12 @@
 <template>
   <div>
-    <div>
+    <div class="answersContainer">
       <p v-show="showError">{{ errorMessage }}</p>
       <answercomponent
         :answers="bbddAnswers"
-        v-on:editedAnswer="getComponentData"
+        v-on:editedAnswer="postEditedAnswer"
         v-on:deleteAnswer="deleteAnswer"
       />
-      <!--EDITAR RESPUESTA-->
-      <div v-show="editAnswer" class="answerEdit">
-        <div>
-          <textarea type="text" name="textAnswer" rows="4" v-model="currentAnswer"></textarea>
-
-          <button @click="deleteAnswer(idAnswerEdit)">Borrar respuesta</button>
-        </div>
-        <button @click="postEditedAnswer(idAnswerEdit)">GUARDAR</button>
-        <button @click="cancelRequest()">CANCELAR</button>
-      </div>
     </div>
   </div>
 </template>
@@ -41,28 +31,18 @@ export default {
   },
   data() {
     return {
-      //Variable de componente
-      editAnswer: false,
       //Variable de vista
       bbddAnswers: [],
-      currentAnswer: "",
-      idAnswerEdit: "",
+
       //variables de gestion de errores
       showError: false,
       errorMessage: "",
 
       //TOKEN
-      token: getAuthToken(),
+      token: "",
     };
   },
   methods: {
-    //TRAER DESDE EL COMPONENTE LOS DATOS DE LA PREGUNTA PARA EDITAR
-    getComponentData(data) {
-      this.editAnswer = true;
-      this.currentAnswer = data.currentAnswer;
-      this.idAnswerEdit = data.id;
-      console.log(data);
-    },
     //TRAER RESPUESTAS HECHAS POR EL USUARIO DESDE LA BBDD
     async getAnswers() {
       try {
@@ -73,14 +53,14 @@ export default {
         this.errorMessage = error.response.data.message;
       }
     },
-    async postEditedAnswer(id) {
+    async postEditedAnswer(componentData) {
       try {
         let data = {
-          content: this.currentAnswer,
+          content: componentData.currentAnswer,
         };
 
         const response = await axios.put(
-          ENDPOINT + "/edit-answer/" + id,
+          ENDPOINT + "/edit-answer/" + componentData.id,
           data,
           config
         );
@@ -91,7 +71,6 @@ export default {
         this.errorMessage = error.response.data.message;
       }
     },
-
     async deleteAnswer(idAnswer) {
       try {
         const response = await axios.delete(
@@ -107,15 +86,33 @@ export default {
         this.errorMessage = error.response.data.message;
       }
     },
-    cancelRequest() {
-      this.editAnswer = false;
-      location.reload();
-    },
   },
-  created() {
-    this.getAnswers();
+  async created() {
+    this.token = getAuthToken();
+    await this.getAnswers();
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.answersContainer {
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  align-content: space-between;
+}
+
+@media only screen and (min-width: 600px) {
+}
+@media only screen and (min-width: 1200px) {
+  .dashHomeContent {
+    margin: 2rem;
+    max-width: 65vw;
+  }
+  .answersContainer {
+    margin-bottom: 3rem;
+  }
+}
+</style>

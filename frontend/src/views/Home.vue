@@ -7,10 +7,6 @@
       :languages="languages"
     />
 
-    <!--  <button>
-      <router-link :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
-    </button>
-    -->
     <p v-show="showError">{{ errorMessage }}</p>
     <showquestions
       id="questionsBody"

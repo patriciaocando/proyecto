@@ -3,7 +3,7 @@
     <!--ELEMENTOS COMUNES-->
     <div class="dashHomeContent">
       <!--COMPONENTE DE BUSQUEDA-->
-      <div class="searchContainer">
+      <div id="searchContainer" v-show="hideSearchBar">
         <h3>BIENVENIDO</h3>
         <h1>Encuentra todas las respuestas que necesitas</h1>
         <searchcomponent class="search" v-on:queryParams="collectParams" :languages="languages" />
@@ -11,60 +11,62 @@
       <!--GESTION DE ERRORES-->
       <p v-show="showError">{{ errorMessage }}</p>
       <!--MOSTRAR LOS RESULTADOS DE LA BUSQUEDA-->
-      <div v-show="showResultSearch">
+      <div class="searchResult" v-show="showResultSearch">
+        <h3>RESULTADOS DE TU BÚSQUEDA:</h3>
         <getquestions :questions="questionsResultSearch" />
       </div>
-
-      <!--VISTA EXPERTO-->
-      <div v-if="role === 'experto'">
-        <h3>EXPERTO</h3>
-        <showquestionstoexpert
-          v-show="allQuestions"
-          :questions="questionsToExpert"
-          v-on:getQuestion="getQuestion"
-        />
-        <answerquestion
-          v-show="!allQuestions"
-          :question="question"
-          v-on:publishAnswer="publishAnswer"
-          v-on:cancelEdition="cancelEdition"
-        />
-      </div>
-
-      <!--VISTA ADMIN-->
-
-      <!--VISTA ESTUDIANTE-->
-      <div v-show="role === 'estudiante'">
-        <div>
-          <h3>ACTIVIDAD RECIENTE</h3>
-          <ShowQuestionsAnswer
-            :questions="studentQuestions"
-            :answer="studentAnswers"
-            :count="count"
-            v-on:questionData="getQuestionData"
-            v-show="showQuestion"
+      <div class="mainView">
+        <!--VISTA EXPERTO-->
+        <div v-if="role === 'experto'">
+          <h3 v-show="hideSearchBar">ACTIVIDAD RECIENTE</h3>
+          <showquestionstoexpert
+            v-show="allQuestions"
+            :questions="questionsToExpert"
+            v-on:getQuestion="getQuestion"
           />
-          <div v-show="noQuestions">
-            <p>¡Haz tu primera pregunta!</p>
-          </div>
+          <answerquestion
+            v-show="!allQuestions"
+            :question="question"
+            v-on:publishAnswer="publishAnswer"
+            v-on:cancelEdition="cancelEdition"
+          />
         </div>
-        <!--EDITAR PREGUNTA-->
-        <div v-show="hideQuestion">
-          <h2>EDITAR PREGUNTA:</h2>
-          <h3>TITULO:</h3>
-          <input type="text" :placeholder="title" v-model="title" />
-          <textarea
-            type="text"
-            name="textQuestion"
-            rows="4"
-            :placeholder="content"
-            v-model="content"
-          ></textarea>
-          <p v-show="showError">{{ errorMessage }}</p>
-          <button @click="deleteQuestion()">Borrar pregunta</button>
+
+        <!--VISTA ADMIN-->
+
+        <!--VISTA ESTUDIANTE-->
+        <div v-show="role === 'estudiante'">
           <div>
-            <button @click="saveEdition()">GUARDAR</button>
-            <button class="cancelButton" @click="cancelEdition()">CANCELAR</button>
+            <h3>ACTIVIDAD RECIENTE</h3>
+            <ShowQuestionsAnswer
+              :questions="studentQuestions"
+              :answer="studentAnswers"
+              :count="count"
+              v-on:questionData="getQuestionData"
+              v-show="showQuestion"
+            />
+            <div v-show="noQuestions">
+              <p>¡Haz tu primera pregunta!</p>
+            </div>
+          </div>
+          <!--EDITAR PREGUNTA-->
+          <div v-show="hideQuestion">
+            <h2>EDITAR PREGUNTA:</h2>
+            <h3>TITULO:</h3>
+            <input type="text" :placeholder="title" v-model="title" />
+            <textarea
+              type="text"
+              name="textQuestion"
+              rows="4"
+              :placeholder="content"
+              v-model="content"
+            ></textarea>
+            <p v-show="showError">{{ errorMessage }}</p>
+            <button @click="deleteQuestion()">Borrar pregunta</button>
+            <div>
+              <button @click="saveEdition()">GUARDAR</button>
+              <button class="cancelButton" @click="cancelEdition()">CANCELAR</button>
+            </div>
           </div>
         </div>
       </div>
@@ -110,6 +112,9 @@ export default {
       idUserLoged: "",
       username: "",
 
+      //ocultar barra de busqueda
+      hideSearchBar: true,
+
       //Variable para interpolar los lenguages en la busqueda
       languages: [],
       //Variable estudiante
@@ -136,7 +141,7 @@ export default {
       showError: false,
       errorMessage: "",
       //TOKEN
-      token: getAuthToken(),
+      token: "",
     };
   },
   methods: {
@@ -251,6 +256,7 @@ export default {
       this.content = "";
       this.hideQuestion = false;
       this.showQuestion = true;
+      location.reload();
     },
     async saveEdition() {
       //DATA
@@ -309,13 +315,13 @@ export default {
       }
     },
     async getQuestion(id) {
+      this.hideSearchBar = false;
       try {
         const response = await axios.get(ENDPOINT + "/question/" + id, config);
         this.question.push(response.data.data);
         this.allQuestions = false;
         this.idQuestion = id;
       } catch (error) {
-        console.log(error);
         this.showError = true;
         this.errorMessage = error.response.data.message;
       }
@@ -332,44 +338,86 @@ export default {
           "HAS RESPONDIDO",
           "Tu respuesta se ha publicado correctamente"
         );
-        this.$router.push("/UserAnswer");
+        this.$router.push("/UserAnswers");
       } catch (error) {
         this.showError = true;
         this.errorMessage = error.response.data.message;
       }
     },
   },
-  created() {
-    getAuthToken();
-    this.getRole();
-    this.getLanguages();
+  async created() {
+    this.token = getAuthToken();
+    await this.getRole(this.token);
+    await this.getLanguages();
   },
 };
 </script>
 
 <style scoped>
+.mainView h3 {
+  margin-top: 2rem;
+}
+.searchResult {
+  margin: 2rem 0;
+}
 .dashHomeContent {
-  margin: 2rem;
+  margin: 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  align-content: flex-start;
+  justify-content: space-around;
+  align-items: center;
+  align-content: space-between;
 }
-.searchContainer {
+#searchContainer {
   background-color: var(--ligthBlue);
+  padding: 1rem;
+  border-radius: 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: baseline;
-  padding: 2rem;
-  border-radius: 1rem;
+  flex-wrap: wrap;
 }
-.searchContainer h3,
-.searchContainer h1 {
-  margin-bottom: 1rem;
+h3,
+#searchContainer h1 {
+  text-align: left;
+  margin: 0.5rem;
 }
-.search {
-  width: 50vw;
+
+#searchContainer .search {
+  width: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+  #searchContainer {
+    width: 90%;
+  }
+  .mainView {
+    width: 95%;
+  }
+}
+@media only screen and (min-width: 1200px) {
+  .mainView {
+    margin: 0;
+    width: 100%;
+  }
+  .searchResult {
+    margin: 2rem 0;
+  }
+  .dashHomeContent {
+    margin: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start;
+  }
+  #searchContainer {
+    padding: 2rem;
+    max-width: 60vw;
+  }
+  h3,
+  #searchContainer h1 {
+    text-align: left;
+    margin: 0.5rem 0;
+  }
 }
 </style>

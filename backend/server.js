@@ -6,6 +6,7 @@ const express = require("express"); //ayuda con las conexiones con el servidor
 const morgan = require("morgan"); //Ver informacion de la peticion del servidor
 const bodyparser = require("body-parser"); //leer los json desde el servidor
 const fileupload = require("express-fileupload"); //permite cargar archivos desde el servidor
+const cors = require("cors");
 
 const app = express();
 const port = process.env.PORT;
@@ -13,6 +14,8 @@ const port = process.env.PORT;
 app.use(morgan("dev"));
 app.use(bodyparser.json());
 app.use(fileupload());
+app.use(cors());
+app.use(express.static("static"));
 
 //Controllers de ruta
 const questionExist = require("./middlewares/questionExist");
@@ -38,6 +41,7 @@ const postAnswer = require("./controllers/answers/postAnswer");
 const postAnswerRating = require("./controllers/answers/postAnswerRating");
 const editAnswer = require("./controllers/answers/editAnswer");
 const deleteAnswer = require("./controllers/answers/deleteAnswer");
+const getAnswersQuestion = require("./controllers/answers/getAnswersQuestion");
 
 //Controllers Languajes-experts
 const getExperts = require("./controllers/experts/getExperts");
@@ -66,7 +70,7 @@ const editLanguage = require("./controllers/languages/editLanguage");
 const deleteLanguage = require("./controllers/languages/deleteLanguage");
 
 //ENDPOINTS - QUESTIONS --------------------------------------//
-//Lista todas las preguntas //Filtrar preguntas ✅
+//Lista todas las preguntas //Filtrar preguntas ✅✅
 //publico //GET
 app.get("/questions", getQuestions);
 
@@ -83,24 +87,24 @@ app.get(
   getAnsweredQuestion
 );
 
-//Mostrar las preguntas realizadas por un usuario ✅
+//Mostrar las preguntas realizadas por un usuario ✅✅
 //privado //GET
-app.get("/my-questions/", isUser, getUserQuestions);
+app.get("/my-questions", isUser, getUserQuestions);
 
 //mostrar las preguntas sin responder del lenguage de un experto (usando req.auth.id)  ✅
 //privado//get
 app.get("/questions/to-answer", isUser, isExpert, getQuestionsToAnswer);
 
-//Publicar pregunta ✅
+//Publicar pregunta ✅✅
 //privado //post
 app.post("/new-question", isUser, postQuestion);
 
-//Editar pregunta ✅
+//Editar pregunta ✅✅
 //privado //put
 app.put("/edit-question/:id_question", isUser, questionExist, editQuestion);
 
 //Borrar pregunta
-//privado //delete ✅
+//privado //delete ✅✅
 app.delete(
   "/delete-question/:id_question",
   isUser,
@@ -110,15 +114,19 @@ app.delete(
 
 //ENDPOINTS - ANSWERS -----------------------------------------//
 
-//Mostrar todas las preguntas con respuestas ✅
+//Mostrar las respuestas de una pregunta ✅✅
+//privado //get
+app.get("/answer/:id_question", isUser, getAnswersQuestion);
+
+//Mostrar todas las preguntas con respuestas ✅✅
 //privado //GET
 app.get("/answered-questions", isUser, getAllAnsweredQuestion);
 
-//Listar respuestas de un usuario ✅
+//Listar respuestas de un usuario ✅✅
 //Privado //GET
 app.get("/answer", isUser, isExpert, getAnswers);
 
-//Publicar respuesta ✅
+//Publicar respuesta ✅✅
 //privado //post
 app.post(
   "/new-answer/:id_question",
@@ -128,11 +136,11 @@ app.post(
   postAnswer
 );
 
-//Editar respuesta ✅
+//Editar respuesta ✅✅
 //privado //put
 app.put("/edit-answer/:id_answer", isUser, isExpert, answerExist, editAnswer);
 
-//Borrar respuesta ✅
+//Borrar respuesta ✅✅
 //privado //delete
 app.delete("/delete-answer/:id_answer", isUser, isExpert, deleteAnswer);
 
@@ -143,35 +151,35 @@ app.post("/rating/answer/:id_answer", isUser, postAnswerRating);
 //----------------------------------------------------------//
 //ENDPOINTS - USUARIO
 
-//Registro Usuario //publico ✅
+//Registro Usuario //publico ✅✅
 //post
 app.post("/new-user", newUser);
 
-//Confirmar registro ✅
+//Confirmar registro ✅✅
 //GET
 app.get("/users/validate/:code", validateUser);
 
-//Login Usuario ✅
+//Login Usuario ✅✅
 //Privado //post
 app.post("/users/login", loginUser);
 
-//Ver perfil de usuario ✅
+//Ver perfil de usuario ✅✅
 //privado //GET
 app.get("/users/profile/:id", isUser, getUser);
 
-//Edicion de perfil ✅
+//Edicion de perfil ✅✅
 //privado //Post
 app.put("/users/edit-profile/:id", isUser, editUser);
 
-//Cambio de contrasenia ✅
+//Cambio de contrasenia ✅✅
 //privado //post
 app.post("/users/:id/password", isUser, editPassword);
 
-//Recover de password (codigo de validacion) ✅
-//publico // get
+//Recover de password (codigo de validacion) ✅✅
+//publico //get
 app.post("/users/recover-password/", recoverUserPassword);
 
-//Cambiar la contrasenia publicamente ✅
+//Cambiar la contrasenia publicamente ✅✅
 //publico //put
 app.post("/users/reset-password", resetUserPassword);
 
@@ -181,34 +189,34 @@ app.delete("/users/delete-user/:id", isUser, isAdmin, deleteUser);
 
 //ENDPOINTS - EXPERTOS --------------------------------------//
 
-//Lista expertos ✅
+//Lista expertos ✅✅
 //Publico //GET
 app.get("/experts", getExperts);
 
-//Listar los lenguages de un experto ✅
+//Listar los lenguages de un experto ✅✅
 //privado //get
 app.get("/expert/languages", isUser, isExpert, getExpertLanguages);
 
-//solictar convertirse en experto ✅
+//solictar convertirse en experto ✅✅
 //post //privado
 app.post("/users/upgrade-user", isUser, upgradeUser);
 
-//Validar nuevo experto ✅
+//Validar nuevo experto ✅✅
 //privado //post
-app.post(
-  "/users/validate-expert/:id_user/:languages/",
-  isUser,
-  isAdmin,
-  userToExpert
-);
+app.post("/users/validate-expert/:id_user", isUser, isAdmin, userToExpert);
 
-//asociar a lenguaje ✅
+//asociar a lenguaje ✅✅
 //privado para expertos
 app.put("/users/add-language", isUser, isExpert, addUserLanguage);
 
-//borrar lenguaje de experto ✅
+//borrar lenguaje de experto ✅✅
 //privado para expertos
-app.delete("/users/delete-language", isUser, isExpert, deleteUserLanguage);
+app.delete(
+  "/users/delete-language/:language",
+  isUser,
+  isExpert,
+  deleteUserLanguage
+);
 
 //Darse de baja como experto a estudiante ✅
 //privado //put
@@ -216,7 +224,7 @@ app.put("/users/decline-expert", isUser, declineExpert);
 
 //ENDPOINTS -LENGUAGES  --------------------------------------//
 
-//Listar lenguajes ✅
+//Listar lenguajes ✅✅
 //publico //GET
 app.get("/languages", getLanguages);
 

@@ -6,7 +6,7 @@ async function deleteUserLanguage(req, res, next) {
   try {
     connection = await getConnection();
 
-    const { language } = req.body;
+    const { language } = req.params;
 
     //verificar que el usuario existe ne la base de datos
     const [currentUser] = await connection.query(

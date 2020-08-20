@@ -6,7 +6,8 @@ async function userToExpert(req, res, next) {
   try {
     connection = await getConnection();
 
-    const { id_user, languages } = req.params;
+    const { id_user } = req.params;
+    const { languages } = req.body;
     const languagesId = languages.split(",");
 
     //Selecciono los datos del usuarioq ue quiere hacerse experto

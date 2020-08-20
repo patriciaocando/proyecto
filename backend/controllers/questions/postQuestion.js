@@ -5,6 +5,7 @@ async function postQuestion(req, res, next) {
   let connection;
   try {
     await postQuestionSchema.validateAsync(req.body);
+
     connection = await getConnection();
     const { title, content, language } = req.body;
     const user = req.auth.id;

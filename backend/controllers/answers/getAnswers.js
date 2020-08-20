@@ -10,23 +10,27 @@ async function getAnswers(req, res, next) {
       `
     SELECT
         A.id AS 'id',
-        A.answer_text,
-        A.date_answer,
+        A.answer_text AS 'answer',
+        A.date_answer AS 'respond',
         A.id_question,
+        Q.id_user,
         Q.title,
-        Q.question_text,
-        A.id_user_expert,
-        U.name_user AS 'userExpert',
-        U.avatar,
-        LT.name_language AS 'Language',
-        AVG(UR.rating) AS 'rating'
+        Q.question_text ,
+        Q.date,
+        U.name_user,
+        A.id_user_expert AS 'id_expert',
+        U.avatar AS 'avatar',
+        LT.name_language,
+        AVG(UR.rating) AS 'rating',
+        COUNT(A.id_question) AS 'answers'
     FROM answers A
     INNER JOIN questions Q ON A.id_question = Q.id
-    INNER JOIN users U ON A.id_user_expert=U.id
+    INNER JOIN users U ON Q.id_user=U.id 
     INNER JOIN languages_tech LT ON Q.id_language=LT.id
     INNER JOIN users_rating UR ON A.id=UR.id_answer
     WHERE A.id_user_expert = ?
-    GROUP BY A.id;
+    GROUP BY A.id
+    ORDER BY A.date_answer DESC;
       `,
       [req.auth.id]
     );

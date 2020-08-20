@@ -9,10 +9,10 @@
 
         <p>{{ answer.answer }}</p>
         <div class="metaDataAnswr">
-          <h4>
+          <p class="accesibilityTxt">
             {{ getFormat(answer.respond) }} | Hace:
             {{ getDistance(answer.respond) }}
-          </h4>
+          </p>
 
           <div
             class="ratingStyle"

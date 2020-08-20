@@ -23,7 +23,10 @@ async function getExpertLanguages(req, res, next) {
     const [result] = await connection.query(
       `
      SELECT
-        LT.name_language AS 'Language'
+     LT.id,
+        LT.name_language AS 'language',
+        LT.description,
+        LT.image
     FROM users U
     INNER JOIN users_languages UL ON U.id=UL.id_user
     INNER JOIN languages_tech LT ON UL.id_language=LT.id

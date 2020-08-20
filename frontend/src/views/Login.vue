@@ -70,7 +70,6 @@ export default {
           await setAuthToken(response.data.data);
           this.$router.push("/dashboard");
         } catch (error) {
-          console.log(error.response);
           this.showError = true;
           this.errorMessage = error.response.data.message;
         }

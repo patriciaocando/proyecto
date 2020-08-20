@@ -1,37 +1,13 @@
 <template>
   <div>
-    <div
-      class="questionInfo"
-      v-for="(question, index) in questions"
-      :key="question.id"
-    >
-      <!--<div class="autorInfo">
-        <img class="avatar" :src="question.question.avatar" />
-        <p>{{ question.question.name_user }}</p>
-      </div>-->
-      <h3>{{ question.question.title }}</h3>
-      <button @click="sendIndex(index)">Editar</button>
-      <span class="metaText">
-        <p>
-          Formulada: {{ getFormat(question.question.date) }} | Hace:
-          {{ getDistance(question.question.date) }}
-        </p>
+    <div class="questionInfo" v-for="(question, index) in questions" :key="question.id">
+      <question :question="question.question" />
 
-        <p>{{ question.question.name_language }}</p>
-      </span>
-      <p>{{ question.question.question_text }}</p>
       <p>{{ count }}</p>
-      <button v-show="seeButtonAnswer" @click="showAnswers()">
-        VER RESPUESTAS
-      </button>
+      <button v-show="seeButtonAnswer" @click="showAnswers()">VER RESPUESTAS</button>
 
       <!--RESPUESTAS-->
-      <div
-        v-show="seeAnswer"
-        class="answerInfo"
-        v-for="answer in answers"
-        :key="answer.id"
-      >
+      <div v-show="seeAnswer" class="answerInfo" v-for="answer in answers" :key="answer.id">
         <img class="avatar" :src="question.answer[index].avatar" />
         <p>{{ question.answer[index].expert }}</p>
         <p>{{ question.answer[index].answer }}</p>
@@ -41,7 +17,7 @@
         </p>
         <p>
           {{ question.answer[index].rating }} ({{
-            question.answer[index].total_votes - 1
+          question.answer[index].total_votes - 1
           }})
         </p>
       </div>
@@ -52,8 +28,14 @@
 <script>
 import { format, formatDistance } from "date-fns";
 import es from "date-fns/locale/es";
+
+import question from "@/components/Question.vue";
+
 export default {
   name: "ShowQuestionsAnswer",
+  components: {
+    question,
+  },
   data() {
     return {
       seeAnswer: false,

@@ -19,24 +19,8 @@ const postQuestionSchema = Joi.object().keys({
       )
     ),
   language: Joi.string()
-    .valid(
-      "Javascript",
-      "CSS",
-      "HTML",
-      "Java",
-      "PHP",
-      "SQL",
-      "Angular",
-      "Vue",
-      "NodeJS"
-    )
     .required()
-    .error(
-      errorGenerator(
-        `Debes ingresar lenguage valido para realizar tu pregunta`,
-        400
-      )
-    ),
+    .error(errorGenerator(`Debes escoger un lenguaje`, 400)),
 });
 
 const editQuestionSchema = Joi.object().keys({
@@ -60,44 +44,20 @@ const editQuestionSchema = Joi.object().keys({
 });
 
 const filterQuestionsSchema = Joi.object().keys({
-  name: Joi.string(),
-  search: Joi.string()
-    .max(100)
-    .error(
-      errorGenerator(
-        `Debes ingresar un titulo de maximo 100 caracteres para realizar tu pregunta`,
-        400
-      )
-    ),
+  name: Joi.any(),
+  search: Joi.any(),
   status: Joi.string()
-    .valid("true", "false")
+    .valid("true", "false", "")
     .error(
       errorGenerator(
         `Debes ingresar "true" para ver preguntas sin responsder o "false" para ver preguntas respondidas`,
         400
       )
     ),
-  language: Joi.string()
-    .valid(
-      "Javascript",
-      "CSS",
-      "HTML",
-      "Java",
-      "PHP",
-      "SQL",
-      "Angular",
-      "Vue",
-      "NodeJS"
-    )
-    .error(
-      errorGenerator(
-        `Debes ingresar lenguage valido para realizar tu pregunta`,
-        400
-      )
-    ),
-  direction: Joi.string()
-    .valid("ASC", "DESC")
-    .error(errorGenerator(`Debes ingresar "ASC" o "DESC" para ordenar`, 400)),
+  direction: Joi.any(),
+  language: Joi.any(),
+  date_init: Joi.any(),
+  date_end: Joi.any(),
 });
 
 module.exports = {

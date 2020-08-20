@@ -6,7 +6,7 @@ async function upgradeUser(req, res, next) {
   try {
     connection = await getConnection();
     const { languages } = req.body;
-
+    console.log("estoy recibiendo", languages);
     //traer info del usuario
     const [currentUser] = await connection.query(
       `
@@ -58,6 +58,8 @@ async function upgradeUser(req, res, next) {
     //guardo los lenguages en un string
     const languagesStr = languages.join(",");
 
+    console.log(" estoy enviando en la url", languagesStr);
+
     //buscar el email del usuario administrador
     const [adminInfo] = await connection.query(`
       SELECT email
@@ -66,7 +68,7 @@ async function upgradeUser(req, res, next) {
       `);
 
     //users/validate-expert/:id/:languages
-    const validationURL = `${process.env.PUBLIC_HOST}/users/validate-expert/${req.auth.id}/${languagesStr}`;
+    const validationURL = `${process.env.FRONTEND_URL}/validar-experto?id=${req.auth.id}&lang=${languagesStr}`;
     const languagesNameStr = languagesName.join(",");
 
     try {

@@ -69,7 +69,7 @@ const editPasswordSchema = Joi.object().keys({
     .required()
     .error(
       errorGenerator(
-        `Debes ingresar tu password actual, recuerda que debe tener minimo 8 caracteres`,
+        `Recuerda que tu password actual debe tener minimo 8 caracteres`,
         400
       )
     ),

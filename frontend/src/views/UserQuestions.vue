@@ -1,8 +1,5 @@
 <template>
   <div>
-    <div>
-      <router-link :to="{ name: 'NewQuestion' }">Hacer nueva pregunta</router-link>
-    </div>
     <ShowQuestionsAnswer
       :questions="UserQuestion"
       :answer="UserAnswers"
@@ -34,6 +31,7 @@
 
 <script>
 import axios from "axios";
+import question from "@/components/Question.vue";
 
 import {
   getAuthToken,
@@ -51,7 +49,7 @@ export default {
     return {
       UserQuestion: [],
       UserAnswers: [],
-      token: getAuthToken(),
+      token: "",
       hideQuestion: false,
       showQuestion: true,
       noQuestions: false,
@@ -69,6 +67,7 @@ export default {
   },
   components: {
     ShowQuestionsAnswer,
+    question,
   },
 
   methods: {
@@ -180,7 +179,8 @@ export default {
       }); */
     },
   },
-  created() {
+  async created() {
+    this.token = getAuthToken();
     this.getQuestionsAnwer();
   },
 };

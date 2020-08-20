@@ -1,5 +1,10 @@
 const { getConnection } = require("../../db");
-const { randomCodeString, sendMail, errorGenerator } = require("../../helpers");
+const {
+  randomCodeString,
+  sendMail,
+  errorGenerator,
+  processImage,
+} = require("../../helpers");
 const { newUserSchema } = require("../../validator/userValidator");
 
 async function newUser(req, res, next) {
@@ -48,7 +53,8 @@ async function newUser(req, res, next) {
     // se genera un codigo aleatroreo
     const userCode = randomCodeString(40);
     //se crea una url para confirmar el codigo
-    const validationURL = `${process.env.PUBLIC_HOST}/users/validate/${userCode}`;
+    //`${process.env.PUBLIC_HOST}/users/validate/${userCode}`
+    const validationURL = `${process.env.FRONTEND_URL}/activar?${userCode}`;
 
     //Se envia un email con la URL de confirmacion
     try {
@@ -61,16 +67,20 @@ async function newUser(req, res, next) {
       throw errorGenerator("Error en el envio de mail", 500);
     }
 
+    //avatar por defecto
+    const defaultAvatar = "defaultAvatar.png";
+
     //meter en nuevo usuario en la base de datos sin activar
     await connection.query(
       `
-      INSERT INTO users(email, password, username, registration_code, role, update_date, creation_date)
-      VALUES(?,SHA2(?,512),?,?, 'estudiante', UTC_TIMESTAMP,UTC_TIMESTAMP)`,
-      [email, password, username, userCode]
+      INSERT INTO users(email, password, username, registration_code, role, avatar, update_date, creation_date)
+      VALUES(?,SHA2(?,512),?,?, 'estudiante',?, UTC_TIMESTAMP,UTC_TIMESTAMP)`,
+      [email, password, username, userCode, defaultAvatar]
     );
 
     res.send({
       status: "ok",
+      activationUrl: validationURL,
       message: `Usuario registrado. Confirma tu email para activar tu cuenta en Tutorships. Recuerda revisar un carpeta de SPAM`,
     });
   } catch (error) {

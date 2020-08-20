@@ -14,7 +14,7 @@ async function editPassword(req, res, next) {
     // verificar que tiene permiso para editar la contrasenia
     if (req.auth.id !== Number(id)) {
       throw errorGenerator(
-        `No tienes permisos para cambiar esta contrasenia`,
+        `No tienes permisos para cambiar esta contraseña`,
         403
       );
     }
@@ -39,7 +39,7 @@ async function editPassword(req, res, next) {
 
     if (currentUser.length === 0) {
       throw errorGenerator(
-        `No coincide tu contrasenia actual, intenta de nuevo`,
+        `No coincide tu contraseña actual, intenta de nuevo`,
         401
       );
     }
@@ -55,7 +55,7 @@ async function editPassword(req, res, next) {
 
     res.send({
       status: "ok",
-      data: "Has actualizado tu nueva contasenia",
+      data: "Has actualizado tu nueva contaseña",
     });
   } catch (error) {
     next(error);

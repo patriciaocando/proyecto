@@ -2,37 +2,15 @@
   <div>
     <div class="questionContent">
       <div class="questionInfo" v-for="(question, index) in questions" :key="question.id">
-        <!--AUTOR DE LA PREGUNTA-->
-        <div class="autorInfo">
-          <img class="avatar" :src="getImageName(question.avatar)" />
-          <p>{{ question.name_user }}</p>
-        </div>
-        <h3>{{ question.title }}</h3>
-        <!--METADATA FECHA-->
-
-        <span class="dataMeta">
-          <p class="accesibilityTxt">
-            Formulada: {{ getFormat(question.date) }} | Hace:
-            {{ getDistance(question.date) }}
-          </p>
-          <p
-            :class="'languageStyle ' + question.name_language.toLowerCase()"
-          >{{ question.name_language }}</p>
-        </span>
-        <!--CONTENIDO PREGUNTA-->
-        <p class="lengthTxt">{{ question.question_text }}</p>
-        <!--METADATA RESPUESTAS-->
-        <div class="answerMeta">
-          <h3>
-            RESPUESTAS
-            <b class="numberQuestions">{{ question.answers }}</b>
-          </h3>
+        <question :question="question" />
+        <span class="answerMeta">
           <button
+            id="buttonAnswer"
             v-show="isUser"
             :class="{ hideButton: question.answers <= 0 }"
             @click="sendQuestionId(question.id, index)"
           >{{buttonText}}</button>
-        </div>
+        </span>
         <!--MOSTRAR LAS RESPUESTAS-->
         <div v-show="hideAnswer" class="answerContent" v-if="index === answer">
           <getanswer :answers="answers" v-on:newVote="getRating" />
@@ -47,12 +25,14 @@ import { getAuthToken } from "../utils/helpers";
 import { format, formatDistance } from "date-fns";
 import es from "date-fns/locale/es";
 
+import question from "@/components/Question.vue";
 import getanswer from "@/components/GetAnswer.vue";
 
 export default {
   name: "ShowQuestions",
   components: {
     getanswer,
+    question,
   },
   props: {
     questions: Array,
@@ -99,12 +79,7 @@ export default {
       this.answer = index;
       this.$emit("showAnswers", id);
     },
-    getFormat(date) {
-      return format(new Date(date), "dd/M/yyyy", { locale: es });
-    },
-    getDistance(date) {
-      return formatDistance(new Date(date), new Date(), { locale: es });
-    },
+
     sendSearchParams() {
       let params = {
         name: this.autor,
@@ -123,9 +98,6 @@ export default {
         this.filter = true;
       }
     },
-    getImageName(name) {
-      return process.env.VUE_APP_STATIC + name;
-    },
   },
   created() {
     this.getAutentication();
@@ -134,19 +106,12 @@ export default {
 </script>
 
 <style scoped>
-/* * {
-  margin: 0;
-} */
-.lengthTxt {
-  word-break: break-word;
-}
-
-.numberQuestions {
-  color: var(--blue);
-}
-
 .hideButton {
   display: none;
+}
+
+.questionContent {
+  margin: 1rem;
 }
 
 .hideQuestion {
@@ -155,44 +120,35 @@ export default {
 .questionInfo {
   text-align: left;
   background-color: var(--ligthColor);
-  padding: 1rem 1.5rem;
-  margin: 1rem;
+
+  margin: 1rem 0;
   border-radius: 0.25rem;
   display: flex;
   flex-direction: column;
   justify-content: stretch;
 }
 
-.dataMeta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin: 0.5rem 0;
-}
-
 .answerMeta {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 2rem;
+  align-items: space-around;
+  margin: 0 0 1.5rem 0;
 }
-.autorInfo {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 1rem;
+
+#buttonAnswer {
+  margin: 0 1.5rem;
 }
 
 @media only screen and (min-width: 600px) {
   .answerMeta {
     flex-direction: row;
-    justify-content: space-between;
-    margin-top: 2rem;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
   }
 }
 @media only screen and (min-width: 1200px) {
   .questionContent {
-    width: 75vw;
+    max-width: 75vw;
   }
 }
 </style>

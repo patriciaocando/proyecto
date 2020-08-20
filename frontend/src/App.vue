@@ -31,7 +31,7 @@ export default {
   --blue: #337eff;
   --ligthBlue: #e6efff;
   --vibrantBLue: #33ddff;
-  --ligthColor: #f8f8f8;
+  --ligthColor: #e8e8e8;
   --regularColor: #dedede;
   --mediumColor: #7e7e7e;
   --textColor: #5a5a5a;
@@ -56,6 +56,10 @@ export default {
   color: var(--textColor);
   font-weight: var(--semiBold);
   line-height: 1.4rem;
+}
+
+.ligth {
+  color: var(--ligthColor);
 }
 
 h1 {
@@ -226,7 +230,7 @@ input:focus {
 
 @media only screen and (min-width: 600px) {
   .languageStyle {
-    margin: 0.5 0rem;
+    margin: 0 0.5rem;
   }
 }
 @media only screen and (min-width: 1200px) {

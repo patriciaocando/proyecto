@@ -48,7 +48,7 @@ async function getQuestions(req, res, next) {
         U.id AS 'idUser',
         U.name_user, 
         U.avatar, 
-        LT.id AS'idLanguages',
+        LT.id AS 'idLanguages',
         LT.name_language 
     FROM questions Q
     INNER JOIN users U ON Q.id_user=U.id 

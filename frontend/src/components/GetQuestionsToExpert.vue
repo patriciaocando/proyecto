@@ -1,19 +1,14 @@
 <template>
   <div>
-    <div class="questionInfo" v-for="(question,index) in questions" :key="question.id">
-      <div class="autorInfo">
-        <img class="avatar" :src="getImageName(question.avatar)" />
-        <p>{{ question.autor}}</p>
-      </div>
-      <h3>{{ question.title }}</h3>
-      <span>
-        <p>Formulada: {{getFormat(question.date)}} | Hace: {{getDistance(question.date)}}</p>
-        <p>{{ question.name_language }}</p>
-      </span>
-      <p>{{ question.question_text }}</p>
-      <div>
-        <h4>NO HAY RESPUESTAS AUN</h4>
-        <button @click="sendQuestionId(question.id)">RESPONDER</button>
+    <div>
+      <div class="questionContent" v-for="question in questions" :key="question.id">
+        <question :question="question" />
+
+        <!--RESPUESTAS META-->
+        <div class="answerMeta">
+          <h3>NO HAY RESPUESTAS AUN</h3>
+          <button @click="sendQuestionId(question.id)">RESPONDER</button>
+        </div>
       </div>
     </div>
   </div>
@@ -22,10 +17,13 @@
 <script>
 import { format, formatDistance } from "date-fns";
 import es from "date-fns/locale/es";
+import question from "@/components/Question.vue";
 
 export default {
   name: "ShowQuestionsToExpert",
-  components: {},
+  components: {
+    question,
+  },
   props: {
     questions: Array,
   },
@@ -36,26 +34,34 @@ export default {
     sendQuestionId(id) {
       this.$emit("getQuestion", id);
     },
-    getFormat(date) {
-      return format(new Date(date), "dd/M/yyyy", { locale: es });
-    },
-    getDistance(date) {
-      return formatDistance(new Date(date), new Date(), { locale: es });
-    },
-    getImageName(name) {
-      return process.env.VUE_APP_STATIC + name;
-    },
   },
 };
 </script>
 
 <style scoped>
-.questionInfo {
-  text-align: left;
+.questionContent {
+  background-color: var(--ligthColor);
+  border-radius: 0.25rem;
+  padding-bottom: 0.5rem;
 }
 
-.autorInfo {
+.answerMeta {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: space-around;
+  margin: 1rem;
+}
+
+@media only screen and (min-width: 1200px) {
+  .questionContent {
+    max-width: 65vw;
+  }
+
+  .answerMeta {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 1.5rem;
+  }
 }
 </style>

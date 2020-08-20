@@ -17,7 +17,8 @@ async function getUser(req, res, next) {
         email,
         profile_bio,
         avatar, 
-        role
+        role,
+        password
        FROM users
        WHERE id=? 
       `,
@@ -34,16 +35,21 @@ async function getUser(req, res, next) {
     const [userInfo] = currentUser;
 
     const userData = {
+      id: userInfo.id,
       username: userInfo.username,
       avatar: userInfo.avatar,
       role: userInfo.role,
+      name: userInfo.name_user,
+      password: userInfo.password,
     };
 
     if (userInfo.id === req.auth.id || req.auth.role === "admin") {
-      (userData.email = userInfo.email),
-        (userData.profile = userInfo.profile_bio),
-        (userData.name = userInfo.name),
-        (userData.lastName = userInfo.last_name);
+      userData.id = userInfo.id;
+      userData.email = userInfo.email;
+      userData.profile = userInfo.profile_bio;
+      userData.name = userInfo.name_user;
+      userData.lastName = userInfo.last_name;
+      userData.password = userInfo.password;
     }
 
     res.send({

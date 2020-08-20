@@ -55,9 +55,9 @@
           <span class="slider round"></span>
         </label>
       </div>
-      <!--MENSAJE DE ERROR-->
-      <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
     </div>
+    <!--MENSAJE DE ERROR-->
+    <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
     <!--BOTON LIMPIAR FILTROS-->
     <button v-show="filter" id="button3" @click="ereaseFilters()">LIMPIAR FILTROS</button>
 
@@ -147,14 +147,17 @@ export default {
   font-size: 0.9rem;
   font-weight: var(--regularColor);
 }
+.errorTxt {
+  margin: 1rem 0;
+}
 
 .searchContent {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  align-content: flex-start;
+  justify-content: space-around;
+  align-items: stretch;
+  align-content: space-between;
   margin: 0 auto;
   width: 90vw;
   /* background-color: var(--ligthBlue);
@@ -281,7 +284,11 @@ export default {
   }
 
   #Search {
-    background-position: 1% 50%;
+    background-position: 2% 50%;
+  }
+
+  #button3 {
+    background-position: 40% 50%;
   }
 }
 </style>

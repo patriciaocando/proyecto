@@ -16,9 +16,9 @@ async function getSingleQuestion(req, res, next) {
         Q.question_text, 
         Q.date, 
         Q.status_question,
-        U.name_user AS 'Autor', 
+        U.name_user, 
         U.avatar, 
-        LT.name_language AS 'Language'
+        LT.name_language
     FROM questions Q
     INNER JOIN users U ON Q.id_user=U.id 
     INNER JOIN languages_tech LT ON Q.id_language=LT.id

@@ -2,8 +2,6 @@
   <div>
     <div id="nav">
       <div class="links">
-        <h3>¡HOLA!</h3>
-        <h4>{{username}}</h4>
         <router-link :to="{ name: 'Dashboard' }">Inicio</router-link>
         <router-link :to="{ name: 'UserQuestions' }">Mis preguntas</router-link>
         <router-link :to="{ name: 'UserAnswers' }">Mis respuestas</router-link>
@@ -38,7 +36,6 @@ export default {
 
 <style scoped>
 #nav {
-  padding: 3rem;
   background-color: var(--ligthColor);
   display: flex;
   flex-direction: column;
@@ -49,7 +46,8 @@ export default {
 }
 
 #nav .links a {
-  padding: 1rem 0;
+  color: var(--darkColor);
+  padding: 2rem;
   background-color: var(--ligthColor);
   display: flex;
   flex-direction: column;
@@ -57,6 +55,11 @@ export default {
   min-width: 10vh;
   text-align: left;
   text-decoration: none;
+}
+
+#nav a.router-link-exact-active {
+  color: var(--blue);
+  background-color: var(--ligthBlue);
 }
 
 .links {
@@ -71,5 +74,10 @@ export default {
 
 .actions {
   border-top: 1px solid var(--regularColor);
+}
+
+@media only screen and (min-width: 600px) {
+}
+@media only screen and (min-width: 1200px) {
 }
 </style>

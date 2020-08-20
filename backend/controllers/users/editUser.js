@@ -13,6 +13,8 @@ async function editUser(req, res, next) {
   try {
     await editUserSchema.validateAsync(req.body);
 
+    console.log("aqui llego 3");
+
     connection = await getConnection();
     const { id } = req.params;
     const { name, last_name, username, profile_bio, email } = req.body;

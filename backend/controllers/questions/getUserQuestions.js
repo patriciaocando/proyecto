@@ -14,9 +14,9 @@ async function getUserQuestions(req, res, next) {
         Q.question_text, 
         Q.date, 
         Q.status_question,
-        U.name_user AS 'Autor', 
+        U.name_user, 
         U.avatar, 
-        LT.name_language AS 'Language'
+        LT.name_language
     FROM questions Q
     INNER JOIN users U ON Q.id_user=U.id
     INNER JOIN languages_tech LT ON Q.id_language=LT.id
@@ -26,9 +26,9 @@ async function getUserQuestions(req, res, next) {
       [req.auth.id]
     );
 
-    if (result.length === 0) {
+    /*  if (result.length === 0) {
       throw errorGenerator(`No has hecho ninguna pregunta aun`, 400);
-    }
+    } */
 
     let resultAnswers = [];
     let count = 0;
@@ -37,14 +37,16 @@ async function getUserQuestions(req, res, next) {
         `
         SELECT
             A.id AS 'id',
-            A.answer_text AS 'Answer',
+            A.answer_text AS 'answer',
             A.date_answer AS 'date',
             A.id_question,
             A.id_user_expert,
-            U.name_user AS 'Expert',
+            U.name_user AS 'expert',
             U.avatar,
-            LT.name_language AS 'Language',
-            AVG(UR.rating) AS 'rating'
+            LT.name_language,
+            AVG(UR.rating) AS 'rating',
+            COUNT(A.id_question) AS 'answers',
+            COUNT(UR.id_answer) AS 'total_votes'
         FROM answers A
         INNER JOIN questions Q ON A.id_question = Q.id
         INNER JOIN users U ON A.id_user_expert=U.id
@@ -63,7 +65,7 @@ async function getUserQuestions(req, res, next) {
     }
     res.send({
       status: "ok",
-      data: resultAnswers,
+      resultAnswers,
     });
   } catch (error) {
     next(error);

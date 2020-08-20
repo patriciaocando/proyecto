@@ -28,13 +28,12 @@ async function loginUser(req, res, next) {
       );
     } else if (!dbUser[0].active) {
       throw errorGenerator(
-        `EL usuario est'a registrado pero no activado. Verifica tu email y activa tu cuenta`,
+        `EL usuario esta registrado pero no activado. Verifica tu email y activa tu cuenta`,
         401
       );
     }
 
     //gererar token-> contiene informacion confiable y fidedigna del usuario
-
     const tokenData = {
       id: dbUser[0].id,
       role: dbUser[0].role,

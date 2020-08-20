@@ -15,12 +15,12 @@
       <router-link :to="{ name: 'Home' }">Inicio</router-link>
       <router-link :to="{ name: 'About' }">About</router-link>
       <router-link :to="{ name: 'ListExperts' }">Nuestros expertos</router-link>
-      <router-link v-if="!isLoged" :to="{ name: 'Dashboard' }">Mi dashboard</router-link>
-      <router-link v-if="isLoged" :to="{ name: 'Login' }">Login</router-link>
-      <button v-if="isLoged">
+      <router-link v-if="isLoged" :to="{ name: 'Dashboard' }">Mi dashboard</router-link>
+      <router-link v-if="!isLoged" :to="{ name: 'Login' }">Login</router-link>
+      <button v-if="!isLoged">
         <router-link :to="{ name: 'Register' }">¡Regístrate!</router-link>
       </button>
-      <button v-if="!isLoged" id="button2" @click="logoutUser()">Logout</button>
+      <button v-if="isLoged" id="button2" @click="logoutUser()">Logout</button>
     </div>
   </div>
 </template>
@@ -41,11 +41,10 @@ export default {
       location.reload();
     },
     showButtons() {
-      console.log(isLoggedIn());
       this.isLoged = isLoggedIn();
     },
   },
-  beforecreated() {
+  created() {
     this.showButtons();
   },
 };

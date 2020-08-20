@@ -31,6 +31,7 @@ async function processImage(uploadImage) {
 
   //Guardar la imagen en el directorio
   const imageFileName = `${uuid.v4()}.jpg`;
+
   await image.toFile(path.join(imagesPath, imageFileName));
 
   //devolver el nuevo nombre
@@ -75,7 +76,7 @@ function errorGenerator(message, code = 500) {
 
 //Trasnfoma fecha sin hora en formato dd/mm/aaaa a formato ISO
 function dateTransform(date) {
-  const parseDate = parse(date, "d/M/yyyy", new Date());
+  const parseDate = parse(date, "yyyy-M-dd", new Date());
   const sqlDate = formatISO9075(parseDate);
   return sqlDate;
 }

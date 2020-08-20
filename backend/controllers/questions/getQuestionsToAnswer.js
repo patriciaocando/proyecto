@@ -12,11 +12,11 @@ async function getQuestionsToAnswer(req, res, next) {
       ` SELECT 
         Q.id,
         Q.title,
-        Q.question_text AS 'Question',
+        Q.question_text,
         Q.date,
-        U.name_user AS 'Autor',
+        U.name_user AS 'autor',
         U.avatar,
-        LT.name_language AS 'Language'
+        LT.name_language
     FROM questions Q
     INNER JOIN users U ON Q.id_user = U.id 
     INNER JOIN languages_tech LT ON Q.id_language = LT.id
@@ -28,6 +28,23 @@ async function getQuestionsToAnswer(req, res, next) {
     `,
       [req.auth.id]
     );
+
+    //buscar las respuestas en las preguntas
+    for (const [i, question] of result.entries()) {
+      if (question.status_question === 1) {
+        const [answer] = await connection.query(
+          `
+      SELECT COUNT(id) AS 'count'
+      FROM answers
+      WHERE id_question=?
+      `,
+          [question.id]
+        );
+        result[i].answers = answer[0].count;
+      } else {
+        result[i].answers = 0;
+      }
+    }
 
     res.send({
       status: "ok",
