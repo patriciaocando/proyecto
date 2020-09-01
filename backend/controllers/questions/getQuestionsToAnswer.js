@@ -14,7 +14,7 @@ async function getQuestionsToAnswer(req, res, next) {
         Q.title,
         Q.question_text,
         Q.date,
-        U.name_user AS 'autor',
+        COALESCE(U.name_user, U.username) AS 'name_user',
         U.avatar,
         LT.name_language
     FROM questions Q

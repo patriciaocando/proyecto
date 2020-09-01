@@ -21,7 +21,7 @@ async function getAnswers(req, res, next) {
         A.id_user_expert AS 'id_expert',
         U.avatar AS 'avatar',
         LT.name_language,
-        AVG(UR.rating) AS 'rating',
+           COALESCE((SUM(UR.rating)/(COUNT(UR.id_answer)-1)) , 0) AS 'rating',
         COUNT(A.id_question) AS 'answers'
     FROM answers A
     INNER JOIN questions Q ON A.id_question = Q.id

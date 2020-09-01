@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="passContainer">
+    <h2>SEGURIDAD:</h2>
     <div v-show="hideActualPass">
-      <h2>SEGURIDAD:</h2>
       <h3>CONTRASEÑA:</h3>
       <p>**********</p>
       <button @click="showEdition()">CAMBIAR CONTRASEÑA</button>
@@ -66,10 +66,46 @@ export default {
       this.confirmNewPass = "";
       this.activateEdition = false;
       this.hideActualPass = true;
+      this.$emit("cancel");
     },
   },
 };
 </script>
 
 <style scoped>
+.passContainer button {
+  margin: 1rem 0;
+}
+.passContainer {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  max-width: 60vw;
+  margin: 2rem auto;
+  border-top: 1px solid var(--ligthColor);
+}
+.passContainer h2 {
+  margin: 2rem 0;
+}
+
+@media only screen and (min-width: 900px) {
+  .passContainer h2 {
+    text-align: left;
+  }
+
+  .passContainer {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    align-items: flex-start;
+    justify-content: space-around;
+    width: 100%;
+    margin: 1rem 0;
+    border-top: 1px solid var(--ligthColor);
+    padding: 1rem;
+  }
+}
 </style>

@@ -1,10 +1,12 @@
 <template>
   <div class="searchContent">
     <input
+      @newSearch="ereaseFilters()"
       id="Search"
       name="Search"
       type="search"
       v-model="search"
+      autocomplete="off"
       placeholder="Busca por palabras clave, autor, lenguaje, nombre de usuario"
       @click="showError = false"
     />
@@ -12,14 +14,14 @@
     <div class="filterContent" v-show="filter">
       <!--SELECCION DE LENGUAJE-->
       <div class="firstLineFilter">
-        <label for="aviableLanguages">Lenguages:</label>
+        <label for="aviableLanguages">Lenguajes:</label>
         <select id="aviableLanguages" name="aviableLanguages" v-model="language">
-          <!-- <option>Selecciona un lenguage:</option> -->
+          <!-- <option>Selecciona un lenguaje:</option> -->
           <option
             v-for="language in languages"
             :key="language.id"
-            :value="language.name_language"
-          >{{language.name_language}}</option>
+            :value="language.language"
+          >{{ language.language }}</option>
         </select>
 
         <!--AUTOR-->
@@ -43,7 +45,7 @@
           <option value="ASC">Ascendente</option>
         </select>
         <!--CHECKBOX RESPONDIDAS-->
-        <label class="switch" for="answered">
+        <label class="answered" for="answered">
           Respondidas: SI
           <input
             type="checkbox"
@@ -63,9 +65,15 @@
 
     <!--BOTONES DE BUSQUEDA-->
     <div class="searchButtons">
+      <button class="cancelButton" @click="newSearch()">BORRAR BÚSQUEDA</button>
       <button @click="sendSearchParams()">BUSCAR</button>
       <button id="button2" @click="showFilter()">FILTROS</button>
     </div>
+
+    <span class="errorContainer" v-show="newSearchView">
+      <p>{{ response }}</p>
+      <button id="button2" @click="newSearch()">REALIZAR NUEVA BÚSQUEDA</button>
+    </span>
   </div>
 </template>
 
@@ -75,6 +83,7 @@ export default {
   props: {
     questions: Array,
     languages: Array,
+    newSearchData: Object,
   },
   data() {
     return {
@@ -90,6 +99,14 @@ export default {
       errorMessage: "",
       filter: false,
     };
+  },
+  computed: {
+    response() {
+      return this.newSearchData.response;
+    },
+    newSearchView() {
+      return this.newSearchData.newSearchView;
+    },
   },
   methods: {
     sendSearchParams() {
@@ -114,18 +131,18 @@ export default {
           date_end: this.dateEnd,
           status: this.status,
         };
-        console.log(queryParams.date_init);
         this.$emit("queryParams", queryParams);
       }
     },
     showFilter() {
-      if (this.filter) {
-        this.filter = false;
-      } else {
-        this.filter = true;
-      }
+      this.filter = !this.filter;
     },
-
+    newSearch() {
+      this.filter = false;
+      this.newSearchData.newSearchView = false;
+      this.search = "";
+      this.$emit("newSearch");
+    },
     ereaseFilters() {
       this.autor = "";
       this.order = "";
@@ -135,7 +152,6 @@ export default {
       this.dateEnd = "";
       this.status = "";
       this.filter = true;
-      location.reload();
     },
   },
 };
@@ -146,6 +162,11 @@ export default {
   font-family: "Open Sans";
   font-size: 0.9rem;
   font-weight: var(--regularColor);
+}
+.errorContainer {
+  display: block;
+  min-height: 40vh;
+  margin: 0 auto;
 }
 .errorTxt {
   margin: 1rem 0;
@@ -158,10 +179,10 @@ export default {
   justify-content: space-around;
   align-items: stretch;
   align-content: space-between;
-  margin: 0 auto;
-  width: 90vw;
-  /* background-color: var(--ligthBlue);
-  border-radius: 8px; */
+  /*  margin: 0 auto; */
+  width: 100%;
+
+  border-radius: 8px;
 }
 
 /*INPUT PRINCIPAL DE BUSQUEDA*/
@@ -176,8 +197,13 @@ export default {
   margin: 0;
 }
 
+/* #Search:hover,
+#Search:focus {
+  border: 1px solid #009688;
+  background-color: white;
+} */
+
 .filterContent {
-  /* max-width: 100%; */
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
@@ -244,16 +270,21 @@ export default {
   background-color: white;
   box-sizing: border-box;
   border-radius: 4px;
+  border: 1px solid var(--regularColor);
 }
 
-.switch {
+.answered {
   margin-top: 1rem;
+
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   align-content: center;
+}
+.answered input {
+  margin-left: 0.5rem;
 }
 
 /* @media only screen and (max-width: 900px) {
@@ -263,14 +294,14 @@ export default {
   }
 } */
 @media only screen and (min-width: 600px) {
-  .searchContent {
+  /* .searchContent {
     width: 90vw;
-  }
+  } */
 }
 @media only screen and (min-width: 900px) {
-  .searchContent {
+  /* .searchContent {
     width: 75vw;
-  }
+  } */
   .filterContent {
     width: 100%;
     display: flex;
@@ -279,12 +310,12 @@ export default {
     align-items: stretch;
     justify-content: space-around;
     align-content: space-around;
-    background-color: var(--ligthBlue);
+    /* background-color: var(--ligthBlue); */
     border-radius: 8px;
   }
 
   #Search {
-    background-position: 2% 50%;
+    background-position: 1% 50%;
   }
 
   #button3 {
@@ -292,5 +323,3 @@ export default {
   }
 }
 </style>
-
-

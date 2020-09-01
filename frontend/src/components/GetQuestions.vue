@@ -1,32 +1,35 @@
 <template>
   <div>
-    <div class="questionContent">
-      <div class="questionInfo" v-for="(question, index) in questions" :key="question.id">
-        <question :question="question" />
-        <span class="answerMeta">
-          <button
-            id="buttonAnswer"
-            v-show="isUser"
-            :class="{ hideButton: question.answers <= 0 }"
-            @click="sendQuestionId(question.id, index)"
-          >{{buttonText}}</button>
-        </span>
-        <!--MOSTRAR LAS RESPUESTAS-->
-        <div v-show="hideAnswer" class="answerContent" v-if="index === answer">
-          <getanswer :answers="answers" v-on:newVote="getRating" />
-        </div>
-      </div>
+    <div class="questionAnswerContainer" v-for="(question, index) in questions" :key="question.id">
+      <question
+        :question="question"
+        :route="route"
+        :isUser="isUser"
+        @editquestion="editQuestionId"
+        @showmethsanswer="showmethsanswer"
+        :index="index"
+      />
+      <button
+        v-if="!isUser"
+        :class="{ hideButton: question.answers <= 0 }"
+        @click="$router.push({ name: 'Register' })"
+      >Regístrate para ver las respuestas</button>
+
+      <getanswer
+        v-show="hideAnswer"
+        class="answerContent"
+        v-if="index === answer"
+        :answers="answers"
+        @newVote="getRating"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { getAuthToken } from "../utils/helpers";
-import { format, formatDistance } from "date-fns";
-import es from "date-fns/locale/es";
-
 import question from "@/components/Question.vue";
 import getanswer from "@/components/GetAnswer.vue";
+import userData from "@/dataStorage/userData";
 
 export default {
   name: "ShowQuestions",
@@ -40,92 +43,56 @@ export default {
   },
   data() {
     return {
-      idQuestion: 2,
-      hideAnswers: true,
       seeAnswersButton: false,
-      hideAnswer: true,
-      //variable para ocultar boton si no esta autenticado el usuario
-      isUser: "",
+      hideAnswer: false,
 
       //Variable para saber el indice de la pregunta de la que se desea ver la respuesta
       answer: "",
       buttonText: "VER RESPUESTAS",
 
-      //TOKEN
-      token: getAuthToken(),
+      //store del usuario
+      sharedStore: userData.state,
     };
   },
-  computed: {},
+  computed: {
+    isUser() {
+      return this.sharedStore.isLogged;
+    },
+    route() {
+      return this.$route.name;
+    },
+  },
 
   methods: {
     getRating(data) {
       this.$emit("rateAnswer", data);
     },
-    getAutentication() {
-      if (this.token === null) {
-        this.isUser = false;
-      } else {
-        this.isUser = true;
-      }
+    editQuestionId(id) {
+      this.$emit("editquestion", id);
     },
-    sendQuestionId(id, index) {
-      //this.hideAnswer = !this.hideAnswer;
-      if (this.hideAnswer === false) {
-        this.buttonText = "OCULTAR RESPUESTAS";
-      } else {
-        this.buttonText = "VER RESPUESTAS";
-      }
-      this.hideAnswer = !this.hideAnswer;
+    showmethsanswer({ id, index }) {
       this.answer = index;
+      this.hideAnswer = !this.hideAnswer;
       this.$emit("showAnswers", id);
     },
-
-    sendSearchParams() {
-      let params = {
-        name: this.autor,
-        direction: this.order,
-        search: this.search,
-        language: this.language,
-        date_init: this.dateInit,
-        date_end: this.dateEnd,
-        status: this.status,
-      };
-    },
-    showFilter() {
-      if (this.filter) {
-        this.filter = false;
-      } else {
-        this.filter = true;
-      }
-    },
-  },
-  created() {
-    this.getAutentication();
   },
 };
 </script>
 
 <style scoped>
+.questionAnswerContainer {
+  background-color: var(--ligthColor);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-radius: 0.5rem;
+}
+
 .hideButton {
   display: none;
 }
 
-.questionContent {
-  margin: 1rem;
-}
-
 .hideQuestion {
   display: none;
-}
-.questionInfo {
-  text-align: left;
-  background-color: var(--ligthColor);
-
-  margin: 1rem 0;
-  border-radius: 0.25rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
 }
 
 .answerMeta {
@@ -147,8 +114,10 @@ export default {
   }
 }
 @media only screen and (min-width: 1200px) {
-  .questionContent {
-    max-width: 75vw;
+  .answerMeta {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
   }
 }
 </style>

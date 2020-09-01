@@ -1,17 +1,21 @@
 <template>
-  <div>
-    <div class="answersContainer">
-      <p v-show="showError">{{ errorMessage }}</p>
-      <answercomponent
-        :answers="bbddAnswers"
-        v-on:editedAnswer="postEditedAnswer"
-        v-on:deleteAnswer="deleteAnswer"
-      />
-    </div>
+  <div class="container">
+    <span id="sectionTitle">
+      <h1>Tus respuestas</h1>
+      <h2>Aquí puedes ver las respuestas que has realizado</h2>
+    </span>
+    <p v-show="showError">{{ errorMessage }}</p>
+    <answercomponent
+      :answers="bbddAnswers"
+      v-on:editedAnswer="postEditedAnswer"
+      v-on:deleteAnswer="deleteAnswer"
+    />
   </div>
 </template>
 
 <script>
+//STORAGE DE LOS DATOS DE USUARIO
+import userData from "@/dataStorage/userData";
 import axios from "axios";
 import Swal from "sweetalert2";
 import {
@@ -38,15 +42,26 @@ export default {
       showError: false,
       errorMessage: "",
 
-      //TOKEN
-      token: "",
+      sharedStore: userData.state,
     };
+  },
+  computed: {
+    token() {
+      return this.sharedStore.token;
+    },
+    route() {
+      return this.$route.name;
+    },
   },
   methods: {
     //TRAER RESPUESTAS HECHAS POR EL USUARIO DESDE LA BBDD
     async getAnswers() {
       try {
-        const response = await axios.get(ENDPOINT + "/answer", config);
+        const response = await axios.get(ENDPOINT + "/answer", {
+          headers: {
+            Authorization: this.token,
+          },
+        });
         this.bbddAnswers = response.data.data;
       } catch (error) {
         this.showError = true;
@@ -78,7 +93,7 @@ export default {
           config
         );
 
-        alertFunction("Borrada!", "Tu respuesta ha sido borrada.", "success");
+        alertFunction("success", "Borrada!", "Tu respuesta ha sido borrada.");
 
         location.reload();
       } catch (error) {
@@ -88,20 +103,20 @@ export default {
     },
   },
   async created() {
-    this.token = getAuthToken();
     await this.getAnswers();
   },
 };
 </script>
 
 <style scoped>
-.answersContainer {
+/* .answersContainer {
   margin: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
   align-content: space-between;
+  background-color: dodgerblue;
 }
 
 @media only screen and (min-width: 600px) {
@@ -114,5 +129,5 @@ export default {
   .answersContainer {
     margin-bottom: 3rem;
   }
-}
+} */
 </style>

@@ -1,37 +1,54 @@
 <template>
-  <div>
-    <ShowQuestionsAnswer
-      :questions="UserQuestion"
-      :answer="UserAnswers"
-      :count="count"
-      v-on:questionData="getQuestionData"
-      v-show="showQuestion"
+  <div class="container">
+    <span id="sectionTitle" v-show="!hideQuestion">
+      <h1>Tus preguntas</h1>
+      <h2>Aquí puedes ver las preguntas que has realizado</h2>
+    </span>
+
+    <showquestions
+      id="questionsBody"
+      v-if="!hideQuestion"
+      :questions="questions"
+      :answers="answers"
+      @showAnswers="getAnswersById"
+      @rateAnswer="rateAnswer"
+      @editquestion="getQuestionData"
     />
-    <div v-show="noQuestions">
+
+    <div class="emptyState" v-show="noQuestions">
       <p>Aww... aun no has preguntado nada aún</p>
-      <p>¿Quieres hacer una?</p>
-      <router-link :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
+      <h2>¡Haz tu primera pregunta!</h2>
+      <router-link class="button" :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
     </div>
 
     <!--EDITAR PREGUNTA-->
-    <div v-show="hideQuestion">
+    <div class="questionEdit" v-if="hideQuestion">
       <h2>EDITAR PREGUNTA:</h2>
+
       <h3>TITULO:</h3>
-      <input type="text" :placeholder="title" v-model="title" />
+      <input class="titleInput" type="text" :placeholder="title" v-model="title" />
+
       <textarea type="text" name="textQuestion" rows="4" :placeholder="content" v-model="content"></textarea>
-      <p v-show="showError">{{ errorMessage }}</p>
-      <button @click="deleteQuestion()">Borrar pregunta</button>
-      <div>
-        <button @click="saveEdition()">GUARDAR</button>
-        <button class="cancelButton" @click="cancelEdition()">CANCELAR</button>
+
+      <div class="buttonsContainer">
+        <button class="deleteButton" @click="deleteQuestion()">Borrar pregunta</button>
+        <div class="buttonsInsideContainer">
+          <button @click="saveEdition()">GUARDAR</button>
+          <button class="cancelButton" @click="cancelEdition()">CANCELAR</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+//STORAGE DE LOS DATOS DE USUARIO
+import userData from "@/dataStorage/userData";
 import axios from "axios";
+import api from "@/api/api.js";
+
 import question from "@/components/Question.vue";
+import showquestions from "@/components/GetQuestions.vue";
 
 import {
   getAuthToken,
@@ -41,35 +58,40 @@ import {
   ENDPOINT,
 } from "../utils/helpers";
 
-import ShowQuestionsAnswer from "@/components/GetQuestionAnswer.vue";
-
 export default {
   name: "UserQuestions",
+  components: {
+    question,
+    showquestions,
+  },
   data() {
     return {
-      UserQuestion: [],
-      UserAnswers: [],
-      token: "",
+      questions: [],
+      answers: [],
       hideQuestion: false,
-      showQuestion: true,
       noQuestions: false,
-      count: "",
 
       //variables de gestion de errores
       showError: false,
       errorMessage: "",
 
-      //Variables de componente
+      //Variables de la pregunta que se debe editar
       title: "",
       content: "",
       idQuestion: "",
+
+      sharedStore: userData.state,
     };
   },
-  components: {
-    ShowQuestionsAnswer,
-    question,
-  },
 
+  computed: {
+    token() {
+      return this.sharedStore.token;
+    },
+    route() {
+      return this.$route.name;
+    },
+  },
   methods: {
     //DESDE LA VISTA
     cancelEdition() {
@@ -78,46 +100,64 @@ export default {
       this.hideQuestion = false;
       this.showQuestion = true;
     },
-    //DESDE EL COMPONENTE
-    getQuestionData(questionData) {
-      this.hideQuestion = true;
-      this.showQuestion = false;
-      this.title = questionData.title;
-      this.content = questionData.question_text;
-      this.idQuestion = questionData.id;
-    },
-    //DESDE LA BBDD
+    //TRAER LAS PREGUNTAS QUE HA HECHO EL USUARIO DESDE LA BBDD
     async getQuestionsAnwer() {
       try {
-        const response = await axios.get(
-          ENDPOINT + "/my-questions/",
+        const response = await api.userQuestions();
+        this.questions = response;
 
-          {
-            headers: {
-              Authorization: getAuthToken(),
-            },
-          }
-        );
-
-        let resultNumber = response.data.resultAnswers;
-        if (resultNumber.length === 0) {
+        if (this.questions.length === 0) {
           this.noQuestions = true;
-        } else {
-          this.UserQuestion = response.data.resultAnswers;
         }
-        /* console.log();
-        if (response.data.resultAnswers[0].answer.length === 0) {
-          this.count = "NO HAY RESPUESTAS AÚN";
-        } else {
-          this.count = response.data.resultAnswers[0].answer.length;
-          this.UserAnswers = response.data.resultAnswers[0].answer;
-        } */
       } catch (error) {
         this.showError = true;
-        console.log(error);
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
+    //TRAER LAS RESPUESTA DE LA PREGUNTA SELECCIONADA SI ES USUARIO LOGUEADO
+    async getAnswersById(idQuestion) {
+      try {
+        const response = await api.getAnswers(idQuestion);
+        this.answers = response;
+      } catch (error) {
+        this.showError = true;
+        this.errorMessage = error;
+      }
+    },
+    //VOTAR UNA RESPUESTA
+    async rateAnswer(data) {
+      try {
+        const response = await api.postRating(data);
+
+        alertFunction(
+          "success",
+          "Ranking",
+          `¡Has Votado con ${data.rating} puntos!`
+        );
+      } catch (error) {
+        await alertFunction("error", "Opss!", `Ya has votado esta respuesta`);
+      }
+    },
+
+    //DESDE EL COMPONENTE
+    async getQuestionData(id) {
+      this.hideQuestion = true;
+
+      try {
+        const response = await axios.get(ENDPOINT + "/question/" + id, {
+          headers: {
+            Authorization: this.token,
+          },
+        });
+
+        this.title = response.data.data.title;
+        this.content = response.data.data.question_text;
+        this.idQuestion = id;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async saveEdition() {
       //DATA
       let data = {
@@ -129,8 +169,20 @@ export default {
         const response = await axios.put(
           ENDPOINT + "/edit-question/" + this.idQuestion,
           data,
-          config
+          {
+            headers: {
+              Authorization: this.token,
+            },
+          }
         );
+        //ALERT DE EDITAR
+        alertFunction(
+          "success",
+          "Actualizado",
+          `Has editado tu pregunta exitosamente`
+        );
+        await this.getQuestionsAnwer();
+        this.hideQuestion = false;
       } catch (error) {
         this.showError = true;
         this.errorMessage = error.response.data.message;
@@ -142,48 +194,81 @@ export default {
         "Actualizado",
         `Has editado tu pregunta exitosamente`
       );
-      setTimeout(function () {
-        location.reload();
-      }, 1000);
     },
     async deleteQuestion() {
       try {
         const response = await axios.delete(
           ENDPOINT + "/delete-question/" + this.idQuestion,
-          config
+          {
+            headers: {
+              Authorization: this.token,
+            },
+          }
         );
-        alertFunction("Borrada!", "Tu pregunta ha sido borrada.", "success");
+        alertFunction("success", "Borrada!", "Tu pregunta ha sido borrada.");
+        this.hideQuestion = false;
+        await this.getQuestionsAnwer();
       } catch (error) {
         this.showError = true;
         this.errorMessage = error.response.data.message;
       }
-
-      //ALERT DE EDITAR
-      /* Swal.fire({
-        title: "¿Estas seguro que quieres borrar esta pregunta?",
-        text: "",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí!, BORRALA",
-      }).then((result) => {
-        if (result.value) {
-
-          
-
-           setTimeout(function () {
-            location.reload();
-          }, 1000); 
-        }
-      }); */
     },
   },
-  async created() {
-    this.token = getAuthToken();
+  created() {
     this.getQuestionsAnwer();
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+* {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.questionEdit {
+  /*  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 100%; */
+  background-color: var(--ligthColor);
+  padding: 2rem 0 2rem 2rem;
+  border-radius: 0.5rem;
+  -webkit-box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
+  -moz-box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
+  box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
+}
+
+textarea {
+  height: 20rem;
+}
+@media only screen and (min-width: 600px) {
+  .buttonsInsideContainer {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+
+  .buttonsContainer {
+    margin: 0;
+    flex-direction: row;
+    align-items: center;
+  }
+  .deleteButton {
+    background-position: 3% 50%;
+    flex-grow: 1;
+  }
+}
+@media only screen and (min-width: 1200px) {
+  .buttonsContainer {
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+  }
+  .deleteButton {
+    background-position: 1% 50%;
+    padding: 2rem;
+    flex-grow: 0;
+  }
+}
+</style>

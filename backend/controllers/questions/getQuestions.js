@@ -33,7 +33,7 @@ async function getQuestions(req, res, next) {
     if (!direction) {
       directionValue = `DESC`;
     } else {
-      directionValue = `ASC`;
+      directionValue = direction;
     }
 
     let orderBy = `ORDER BY Q.date ${directionValue}`;
@@ -46,7 +46,7 @@ async function getQuestions(req, res, next) {
         Q.date, 
         Q.status_question,
         U.id AS 'idUser',
-        U.name_user, 
+        COALESCE(U.name_user, U.username) AS 'name_user', 
         U.avatar, 
         LT.id AS 'idLanguages',
         LT.name_language 
@@ -96,25 +96,25 @@ async function getQuestions(req, res, next) {
 
     if (queryResult.length === 0) {
       throw errorGenerator(
-        `No hay preguntas que coincidan con tu busqueda`,
+        `No hay resultados que coincidan con tu búsqueda`,
         400
       );
-    }
-
-    //buscar las respuestas en las preguntas
-    for (const [i, question] of queryResult.entries()) {
-      if (question.status_question === 1) {
-        const [answer] = await connection.query(
-          `
+    } else {
+      //buscar las respuestas en las preguntas
+      for (const [i, question] of queryResult.entries()) {
+        if (question.status_question === 1) {
+          const [answer] = await connection.query(
+            `
       SELECT COUNT(id) AS 'count'
       FROM answers
       WHERE id_question=?
       `,
-          [question.id]
-        );
-        queryResult[i].answers = answer[0].count;
-      } else {
-        queryResult[i].answers = 0;
+            [question.id]
+          );
+          queryResult[i].answers = answer[0].count;
+        } else {
+          queryResult[i].answers = 0;
+        }
       }
     }
 

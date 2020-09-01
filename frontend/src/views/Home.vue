@@ -1,37 +1,57 @@
 <template>
   <div class="home">
-    <h1>Bienvenidos a TutorShips</h1>
-    <searchcomponent
-      v-on:queryParams="collectParams"
-      v-on:clearSearch="clearSearch"
-      :languages="languages"
-    />
+    <div class="bannerContainer">
+      <span>
+        <img id="logoMenu" src="../assets/logoTutorshipLigth.svg" alt="logo-tutorships" />
 
-    <p v-show="showError">{{ errorMessage }}</p>
-    <showquestions
-      id="questionsBody"
-      :questions="questions"
-      :answers="answers"
-      v-on:showAnswers="getAnswers"
-      v-on:rateAnswer="rateAnswer"
-    />
+        <h1 class="ligth">¡Lanzate al agua!</h1>
+        <h2 class="ligth">Pregunta a nuestros tutores expertos en cada lenguaje de programación</h2>
+      </span>
+      <div class="bannerImage"></div>
+    </div>
+    <div class="homeContent">
+      <h1>Busca todo lo que necesites:</h1>
+      <searchcomponent
+        @queryParams="collectParams"
+        :languages="languages"
+        :newSearchData="newSearchData"
+        @newSearch="newSearch"
+      />
+      <p v-show="searchMessage">Resultado de tu búsqueda</p>
+      <showquestions
+        v-show="isResult"
+        id="questionsBody"
+        :questions="questions"
+        :answers="answers"
+        @showAnswers="getAnswersById"
+        @rateAnswer="rateAnswer"
+      />
+    </div>
+
+    <div id="expert" class="bannerContainer">
+      <span>
+        <img class="expertIco" src="../assets/icons/experto-blue.svg" />
+
+        <h1>¿Eres un experto?</h1>
+        <h2>
+          Ayuda a estudiantes de programación a convertirse en masters como
+          <b>TÚ.</b>
+        </h2>
+        <router-link id="registerButton" :to="{ name: 'Register' }">¡Regístrate!</router-link>
+      </span>
+      <div class="bannerImage"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+//STORAGE DE LOS DATOS DE USUARIO
+import userData from "@/dataStorage/userData";
+
+import api from "@/api/api.js";
 import showquestions from "@/components/GetQuestions.vue";
 import searchcomponent from "@/components/SearchComponent.vue";
-import {
-  getAuthToken,
-  getRoleToken,
-  alertFunction,
-  config,
-  ENDPOINT,
-} from "../utils/helpers";
-
-import { format, formatDistance } from "date-fns";
-import es from "date-fns/locale/es";
+import { alertFunction } from "../utils/helpers";
 
 export default {
   name: "Home",
@@ -45,91 +65,74 @@ export default {
       answers: [],
       queryParams: {},
       languages: [],
+      isResult: true,
 
-      //variables de gestion de errores
-      showError: false,
-      errorMessage: "",
-      successSearch: true,
-      //TOKEN
-      token: getAuthToken(),
+      newSearchData: {},
+      searchMessage: false,
+
+      sharedStore: userData.state,
     };
+  },
+  computed: {
+    token() {
+      return this.sharedStore.token;
+    },
   },
 
   methods: {
+    newSearch() {
+      this.isResult = true;
+      this.searchMessage = false;
+      this.getQuestions();
+    },
     async rateAnswer(data) {
-      console.log("recibo->", data);
-      let rating = {
-        rating: data.rating,
-      };
-
       try {
-        const response = await axios.post(
-          ENDPOINT + "/rating/answer/" + data.id,
-          rating,
-          config
-        );
+        const response = await api.postRating(data);
         alertFunction(
           "success",
           "Ranking",
           `¡Has Votado con ${data.rating} puntos!`
         );
       } catch (error) {
-        this.errorMessage = error.response.data.message;
         await alertFunction("error", "Opss!", `Ya has votado esta respuesta`);
       }
     },
-    async collectParams(componentParams) {
-      this.successSearch = true;
-      this.showError = false;
+    collectParams(componentParams) {
       this.queryParams = componentParams;
-
-      await this.getQuestions();
+      this.getQuestions(componentParams);
     },
     //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD
-    async getQuestions() {
-      try {
-        const response = await axios.get(ENDPOINT + "/questions", {
-          params: this.queryParams,
-        });
-        this.questions = response.data.data;
-
+    async getQuestions(componentParams) {
+      let response = await api.getQuestions(componentParams);
+      if (response === "No hay resultados que coincidan con tu búsqueda") {
+        this.newSearchData = {
+          response,
+          newSearchView: true,
+        };
+        this.isResult = false;
+      } else {
+        this.searchMessage = false;
+        this.questions = response;
         await this.getLanguages();
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
-
-        if (
-          this.errorMessage === "No hay preguntas que coincidan con tu busqueda"
-        ) {
-          this.successSearch = false;
-        }
       }
     },
-    //TRAER LAS RESPUESTAS DE TODAS LAS PREGUNTAS SI ES USUARIO LOGUEADO
-    async getAnswers(idQuestion) {
+    //TRAER LAS RESPUESTA DE LA PREGUNTA SELECCIONADA SI ES USUARIO LOGUEADO
+    async getAnswersById(idQuestion) {
       try {
-        const response = await axios.get(
-          ENDPOINT + "/answer/" + idQuestion,
-          config
-        );
-        this.answers = response.data.data;
+        this.answers = await api.getAnswers(idQuestion);
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
-    //TRAER LOS LENGUAGES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
+    //TRAER LOS LENGUAJES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
     async getLanguages() {
       try {
-        const response = await axios.get(ENDPOINT + "/languages");
-        this.languages = response.data.data;
+        this.languages = await api.getLanguages();
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
-    },
-    clearSearch() {
-      location.reload();
     },
   },
   created() {
@@ -139,27 +142,187 @@ export default {
 </script>
 
 <style scoped>
+#logoMenu {
+  display: none;
+}
+.bannerContainer {
+  background-image: url("../assets/landing/background.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 60vh;
+  margin: 0 0 5rem;
+}
+.bannerContainer h1 {
+  display: block;
+  font-size: 3em;
+  padding-top: 5rem;
+}
+
+.bannerContainer h2 {
+  display: block;
+  font-weight: var(--regular);
+  line-height: 2.5rem;
+  font-size: 1.8em;
+  max-width: 70vw;
+  margin: 0 auto;
+}
+.bannerImage {
+  background-image: url("../assets/landing/bienvenido.png");
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+  min-height: 60vh;
+  width: 100vw;
+  margin: 0;
+}
+
+#expert {
+  background-image: none;
+  background-color: white;
+  min-height: 60vh;
+  /* width: 100vw; */
+  margin: 0;
+  margin-top: 2rem;
+}
+
+#expert .bannerImage {
+  background-image: url("../assets/landing/experto.png");
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+  min-height: 60vh;
+  margin: 0;
+}
+
+#expert h1 {
+  padding-top: 2rem;
+}
+
+#expert h2 > b {
+  font-weight: var(--bold);
+  font-size: 1em;
+}
+
+#expert h2 {
+  margin-bottom: 2rem;
+}
+.container h1 {
+  text-align: center;
+}
 #questionsBody {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  align-content: center;
 }
 h1 {
   margin-bottom: 2rem;
 }
 
 @media only screen and (min-width: 600px) {
+  .homeContent {
+    margin: 0 6rem;
+  }
   #questionsBody {
-    width: 90vw;
     justify-content: space-between;
     align-items: stretch;
     align-content: space-around;
-    margin: 0 auto;
   }
 }
-/*@media only screen and (min-width: 1200px) {
-} */
+
+@media only screen and (min-width: 800px) {
+  .bannerContainer img#logoMenu {
+    display: block;
+    /*   text-align: left;
+    background-color: tomato; */
+  }
+  .bannerContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    align-content: flex-start;
+    height: 60vh;
+  }
+  .bannerContainer span {
+    width: 30vw;
+  }
+
+  .bannerImage {
+    background-position: right bottom;
+    height: 60vh;
+    width: 50vw;
+  }
+
+  .bannerContainer h1 {
+    text-align: left;
+    font-size: 2em;
+    padding-top: 2rem;
+  }
+
+  .bannerContainer h2 {
+    text-align: left;
+    line-height: 2rem;
+    font-size: 1.5rem;
+    max-width: 30vw;
+    margin-left: 0;
+  }
+
+  #expert .bannerContainer {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    align-content: flex-start;
+    /* height: 60vh; */
+  }
+
+  #expert .bannerContainer span {
+    width: 30vw;
+    text-align: left;
+  }
+
+  #expert .expertIco {
+    display: block;
+  }
+  #expert #registerButton {
+    display: block;
+  }
+
+  .homeContent {
+    margin: 0 6rem;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .bannerContainer {
+    height: 85vh;
+  }
+  .bannerContainer span {
+    width: 40vw;
+  }
+
+  .bannerImage {
+    background-position: left bottom;
+    height: 85vh;
+  }
+
+  .bannerContainer h1 {
+    text-align: left;
+    font-size: 4em;
+
+    padding-top: 3rem;
+  }
+
+  .bannerContainer h2 {
+    text-align: left;
+    line-height: 2.5rem;
+    font-size: 2rem;
+    margin-left: 0;
+    padding-top: 2rem;
+  }
+}
 </style>

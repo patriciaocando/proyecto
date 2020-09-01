@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="answerContainer">
     <div v-for="answer in answers" :key="answer.id">
       <div class="answrContainer">
         <div class="exepertInfo">
@@ -10,8 +10,8 @@
         <p>{{ answer.answer }}</p>
         <div class="metaDataAnswr">
           <p class="accesibilityTxt">
-            {{ getFormat(answer.respond) }} | Hace:
-            {{ getDistance(answer.respond) }}
+            {{ answer.respond | getFormat }} | Hace:
+            {{ answer.respond | getDistance }}
           </p>
 
           <div
@@ -39,12 +39,13 @@
 </template>
 
 <script>
-import { format, formatDistance } from "date-fns";
-import es from "date-fns/locale/es";
 import starrating from "vue-star-rating";
 
 export default {
   name: "getanswer",
+  props: {
+    answers: Array,
+  },
   data() {
     return {
       rating: 0,
@@ -52,14 +53,12 @@ export default {
       currentSelectedRating: "",
     };
   },
-  props: {
-    answers: Array,
-  },
+
   methods: {
     getAnswerId(id) {
       this.idAnswerRate = id;
     },
-    showCurrentRating: function (rating) {
+    showCurrentRating: function(rating) {
       this.currentRating = rating === 0 ? this.currentSelectedRating : rating;
     },
     setCurrentSelectedRating(rating) {
@@ -70,12 +69,7 @@ export default {
       };
       this.$emit("newVote", data);
     },
-    getFormat(date) {
-      return format(new Date(date), "dd/M/yyyy", { locale: es });
-    },
-    getDistance(date) {
-      return formatDistance(new Date(date), new Date(), { locale: es });
-    },
+
     getImageName(name) {
       return process.env.VUE_APP_STATIC + name;
     },
@@ -85,7 +79,8 @@ export default {
 
 <style scoped>
 .answrContainer {
-  margin: 1rem 0;
+  text-align: left;
+  margin: 2rem;
   background-color: white;
   padding: 1rem;
   -webkit-box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);

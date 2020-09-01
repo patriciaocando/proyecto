@@ -23,20 +23,11 @@ const routes = [
     },
   },
   {
-    path: "*",
-    name: "Error",
-    component: () => import("../views/Error.vue"),
+    path: "/expertos",
+    name: "ListExperts",
+    component: () => import("../views/ListExperts.vue"),
     meta: {
-      allowAll: true,
-    },
-  },
-  {
-    path: "/login",
-    name: "Login",
-    component: () => import("../views/Login.vue"),
-    meta: {
-      allowAll: true,
-      layout: "blank",
+      allowAll: false,
     },
   },
   {
@@ -54,6 +45,34 @@ const routes = [
     component: () => import("../views/RegisterValidation.vue"),
     meta: {
       allowAll: true,
+    },
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: () => import("../views/Login.vue"),
+    meta: {
+      allowAll: true,
+      layout: "blank",
+    },
+  },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: () => import("../views/DashboardView.vue"),
+    meta: {
+      allowAll: false,
+      layout: "dashboard",
+    },
+    beforeEnter: (to, from, next) => {
+      if (!isLoggedIn()) {
+        next({
+          path: "/",
+          query: { redirect: to.fullPath },
+        });
+      } else {
+        next();
+      }
     },
   },
   {
@@ -92,14 +111,35 @@ const routes = [
       layout: "blank",
     },
   },
+
   {
-    path: "/expertos",
-    name: "ListExperts",
-    component: () => import("../views/ListExperts.vue"),
+    path: "/mis-respuestas",
+    name: "UserAnswers",
+    component: () => import("../views/UserAnswers.vue"),
     meta: {
       allowAll: false,
+      layout: "dashboard",
     },
   },
+  {
+    path: "/mis-lenguajes",
+    name: "ExpertLanguages",
+    component: () => import("../views/ExpertLanguages.vue"),
+    meta: {
+      allowAll: false,
+      layout: "dashboard",
+    },
+  },
+  {
+    path: "/recover-password",
+    name: "RecoverPassword",
+    component: () => import("../views/RecoverPassword.vue"),
+    meta: {
+      allowAll: false,
+      layout: "blank",
+    },
+  },
+
   //ADMIN
   {
     path: "/validar-experto",
@@ -114,7 +154,7 @@ const routes = [
       let token = getAuthToken();
       if (to.meta.onlyAdmin === true && getRoleToken(token) !== "admin") {
         next({
-          path: "/home",
+          path: "/",
           query: { redirect: to.fullPath },
         });
       } else {
@@ -123,40 +163,11 @@ const routes = [
     },
   },
   {
-    path: "/mis-respuestas",
-    name: "UserAnswers",
-    component: () => import("../views/UserAnswers.vue"),
+    path: "*",
+    name: "Error",
+    component: () => import("../views/Error.vue"),
     meta: {
-      allowAll: false,
-      layout: "dashboard",
-    },
-  },
-  {
-    path: "/mis-lenguages",
-    name: "ExpertLanguages",
-    component: () => import("../views/ExpertLanguages.vue"),
-    meta: {
-      allowAll: false,
-      layout: "dashboard",
-    },
-  },
-
-  {
-    path: "/dashboard",
-    name: "Dashboard",
-    component: () => import("../views/Dashboard.vue"),
-    meta: {
-      allowAll: false,
-      layout: "dashboard",
-    },
-  },
-  {
-    path: "/recover-password",
-    name: "RecoverPassword",
-    component: () => import("../views/RecoverPassword.vue"),
-    meta: {
-      allowAll: false,
-      layout: "blank",
+      allowAll: true,
     },
   },
 ];

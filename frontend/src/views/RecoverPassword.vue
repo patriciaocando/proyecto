@@ -38,8 +38,8 @@
         <h1>Resetea tu contraseña</h1>
         <h3>CÓDIGO DE RESETEO DE CONTRASEÑA:</h3>
         <input type="text" v-model="recoverCode" required />
-        <h3>EMAIL:</h3>
-        <input type="text" v-model="emailConfirm" placeholder="miemail@tutorships.com" required />
+        <h3>NUEVA CONTRASEÑA:</h3>
+        <input type="password" v-model="newPassConfirm" placeholder="**********" required />
         <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
       </div>
       <div class="buttonsContent">
@@ -60,7 +60,7 @@ export default {
     return {
       email: "",
       recoverCode: "",
-      emailConfirm: "",
+      newPassConfirm: "",
       //variables de gestion de errores
       showError: false,
       errorMessage: "",
@@ -91,7 +91,7 @@ export default {
       }
     },
     async sendResetPassword() {
-      if (this.emailConfirm === "" || this.recoverCode === "") {
+      if (this.newPassConfirm === "" || this.recoverCode === "") {
         this.showError = true;
         this.errorMessage =
           "Debes ingresar todos los campos para resetear tu contraseña.";
@@ -99,7 +99,7 @@ export default {
         try {
           let data = {
             recoverCode: this.recoverCode,
-            newPassword: this.emailConfirm,
+            newPassword: this.newPassConfirm,
           };
           const response = await axios.post(
             ENDPOINT + "/users/reset-password",
@@ -120,7 +120,7 @@ export default {
     },
     cancelRecoverCode() {
       this.recoverCode = "";
-      this.emailConfirm = "";
+      this.newPassConfirm = "";
       this.email = "";
       this.showError = false;
       this.showRecoverCode = false;

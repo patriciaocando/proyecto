@@ -1,9 +1,8 @@
 <template>
-  <div>
+  <div class="container">
     <!--DATOS DE USUARIO-->
-    <div>
-      <userprofile v-on:iduserupdate="updateUserData" :userdata="profile" />
-    </div>
+
+    <userprofile :currentUser="currentUser" @iduserupdate="updateUserData" :cancel="deleteError" />
     <p v-show="showError">{{ errorMessage }}</p>
     <!--CAMBIO DE CONTRASEÑA-->
     <div>
@@ -13,19 +12,16 @@
 </template>
 
 <script>
-import axios from "axios";
-import Swal from "sweetalert2";
-import {
-  getAuthToken,
-  getIdToken,
-  alertFunction,
-  getRoleToken,
-  config,
-  ENDPOINT,
-} from "../utils/helpers";
+//STORAGE DE LOS DATOS DE USUARIO
+import userData from "@/dataStorage/userData";
+import api from "@/api/api";
+
+import { alertFunction, ENDPOINT } from "../utils/helpers";
 
 import userprofile from "@/components/UserProfile.vue";
 import changepassword from "@/components/ChangePassword.vue";
+
+import { cloneDeep } from "lodash";
 
 export default {
   name: "Profile",
@@ -37,21 +33,33 @@ export default {
   data() {
     return {
       //variables de vista
-      profile: {},
       userLanguages: [],
-      userRole: "",
+
       actualPassword: "",
       //variables de gestion de errores
       showError: false,
       errorMessage: "",
-      userId: "",
 
-      //TOKEN
-      token: "",
+      //DATA DE USUARIO
+      sharedStore: userData.state,
     };
+  },
+  computed: {
+    token() {
+      return this.sharedStore.token;
+    },
+    userId() {
+      return this.sharedStore.id;
+    },
+    currentUser() {
+      return cloneDeep(this.sharedStore);
+    },
   },
 
   methods: {
+    deleteError() {
+      this.showError = false;
+    },
     async updateUserData(userData) {
       let formData = new FormData();
       //DATOS DEL USUARIO QUE RECIBO DESDE EL COMPONENTE
@@ -63,65 +71,58 @@ export default {
       formData.append("avatar", userData.avatar);
 
       try {
-        const response = await axios.put(
-          ENDPOINT + "/users/edit-profile/" + this.userId,
-          formData,
-          config,
-          { header: { "Content-type": "multipart/form-data" } }
-        );
-        //ALERT DE EDITAR
+        const response = await api.updateUserProfile(this.userId, formData);
+
+        const updatedUser = await api.getUserProfile(this.userId);
+
+        this.sharedStore.username = updatedUser.username;
+        this.sharedStore.avatar =
+          process.env.VUE_APP_STATIC + updatedUser.avatar;
+        this.sharedStore.email = updatedUser.email;
+        this.sharedStore.name = updatedUser.name;
+        this.sharedStore.lastname = updatedUser.lastName;
+        this.sharedStore.profile = updatedUser.profile;
+
+        //traer el perfil de usurio desde la bbdd
+
         await alertFunction(
           "success",
           "Actualizado",
           `Has editado los datos de ${userData.username} exitosamente`
         );
-        location.reload();
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
-    //TRAIGO LA INFO DEL PERFIL DE USUARIO DE LA BBDD
-    async getUserProfile() {
-      this.token = getAuthToken();
-      try {
-        this.userId = getIdToken(this.token);
-        const response = await axios.get(
-          ENDPOINT + "/users/profile/" + this.userId,
-          config
-        );
-        this.profile = response.data.data;
-        this.profile.avatar = process.env.VUE_APP_STATIC + this.profile.avatar;
-        this.actualPassword = response.data.data.password;
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
-      }
-    },
+
     //CAMBIO DE CONTRASEÑA EN LA BBDD
     async postNewPassword(data) {
       try {
-        console.log(data);
-        const response = await axios.post(
-          ENDPOINT + `/users/${this.userId}/password`,
-          data,
-          config
-        );
+        const response = await api.updateUserpass(this.userId, data);
+
         alertFunction(
           "success",
           "NUEVA CONTRASEÑA",
           "Has actualizado tu contaseña con éxito, haz Login de nuevo"
         );
+        this.sharedStore.id = null;
+        this.sharedStore.role = null;
+        this.sharedStore.token = null;
+        this.sharedStore.username = null;
+        this.sharedStore.avatar = null;
+        this.sharedStore.email = null;
+        this.sharedStore.name = null;
+        this.sharedStore.lastname = null;
+        this.sharedStore.profile = null;
+        this.sharedStore.isLogged = false;
+        api.logout();
         this.$router.push("/login");
       } catch (error) {
-        console.log(error);
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
-  },
-  created() {
-    this.getUserProfile();
   },
 };
 </script>

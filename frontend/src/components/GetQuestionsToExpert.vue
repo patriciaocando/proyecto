@@ -1,14 +1,12 @@
 <template>
   <div>
-    <div>
-      <div class="questionContent" v-for="question in questions" :key="question.id">
-        <question :question="question" />
+    <div class="fondo" v-for="question in questions" :key="question.id">
+      <question :question="question" />
 
-        <!--RESPUESTAS META-->
-        <div class="answerMeta">
-          <h3>NO HAY RESPUESTAS AUN</h3>
-          <button @click="sendQuestionId(question.id)">RESPONDER</button>
-        </div>
+      <!--RESPUESTAS META-->
+      <div class="answerMeta">
+        <h3>NO HAY RESPUESTAS AUN</h3>
+        <button @click="sendQuestionId(question.id)">RESPONDER</button>
       </div>
     </div>
   </div>
@@ -39,10 +37,11 @@ export default {
 </script>
 
 <style scoped>
-.questionContent {
+.fondo {
   background-color: var(--ligthColor);
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .answerMeta {
@@ -53,10 +52,6 @@ export default {
 }
 
 @media only screen and (min-width: 1200px) {
-  .questionContent {
-    max-width: 65vw;
-  }
-
   .answerMeta {
     flex-direction: row;
     justify-content: space-between;

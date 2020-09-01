@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <p>Hack a Boss Bootcamp</p>
+    <p class="ligth">Hack a Boss Bootcamp</p>
     <figure>
       <img
         class="logoMenu"
@@ -9,7 +9,7 @@
         @click="$router.push('/')"
       />
     </figure>
-    <p>Design and development: Patricia Ocando</p>
+    <p class="ligth">Design and development: Patricia Ocando</p>
   </div>
 </template>
 
@@ -20,22 +20,16 @@ export default {
 </script>
 
 <style scoped>
+.logoMenu {
+  margin: 1.5rem 0;
+}
 .footer {
-  color: var(--regularColor);
-  font-weight: var(--ligth);
-  font-size: 11px;
-  padding: 1rem 1.5rem;
+  padding: 1.5rem 3rem;
   background-color: var(--darkColor);
-  margin-top: 5rem;
   display: flex;
   flex-direction: column;
-  align-content: space-between;
   align-items: center;
-  justify-content: space-evenly;
-}
-
-.footer figure img {
-  max-width: 120px;
+  justify-content: space-between;
 }
 
 @media only screen and (min-width: 600px) {
@@ -51,8 +45,10 @@ export default {
   }
 }
 @media only screen and (min-width: 1200px) {
-  .footer figure img {
+  /*  .footer figure img {
     max-width: 90px;
-  }
+    position: fixed;
+    bottom: 0;
+  } */
 }
 </style>

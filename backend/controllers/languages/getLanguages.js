@@ -8,7 +8,7 @@ async function getLanguages(req, res, next) {
     const [result] = await connection.query(`
     SELECT
         id,
-        name_language,
+        name_language  AS 'language',
         description,
         image
     FROM languages_tech; 

@@ -44,8 +44,9 @@ async function postAnswerRating(req, res, next) {
         (id_user,
         id_answer,
         rating,
-        update_date)
-      VALUES(?,?,?,UTC_TIMESTAMP)`,
+        update_date,
+        creation_date)
+      VALUES(?,?,?,UTC_TIMESTAMP,UTC_TIMESTAMP)`,
       [req.auth.id, id_answer, rating]
     );
 

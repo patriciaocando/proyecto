@@ -61,6 +61,7 @@ const editUserSchema = Joi.object().keys({
   email: Joi.string()
     .email()
     .error(errorGenerator(`Debes ingresar un email valido`, 400)),
+  avatar: Joi.any(),
 });
 
 const editPasswordSchema = Joi.object().keys({

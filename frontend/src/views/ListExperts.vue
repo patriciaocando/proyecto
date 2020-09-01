@@ -1,34 +1,46 @@
 <template>
   <div>
-    <h1>Bienvenidos a TutorShips</h1>
+    <vue-headful
+      title="Nuestros Expertos | TutorShip"
+      description="Detalle de cada uno de nuestros expertos"
+    />
+    <h1 class="title">Conoce a nuestros expertos</h1>
     <p v-show="showError">{{ errorMessage }}</p>
 
-    <ul>
-      <li v-for="expert in experts" :key="expert.id">
+    <ul class="allExpContainer">
+      <li class="expertContainer" v-for="expert in experts" :key="expert.id">
         <!-- {{expert}} -->
-        <img class="avatar" :src="getImageName(expert.expert.avatar)" />
-        <h3>USERANAME:</h3>
-        <p>{{ expert.expert.username }}</p>
-        <h3>LENGUAGEs:</h3>
-        <div v-for="language in expert.language" :key="language.id">
-          <p>{{ language.language }}</p>
-          <img class="avatar" :src="getImageName(language.image)" />
+        <div class="autorInfo">
+          <img class="expertAvatar" :src="getImageName(expert.expert.avatar)" />
+          <span>
+            <h3>{{ expert.expert.username }}</h3>
+            <p
+              class="accesibilityTxt"
+            >Experto desde: {{ expert.expert.creation_date | getDistance }}</p>
+          </span>
         </div>
 
-        <h3>BIO:</h3>
-        <p>{{ expert.expert.profile_bio }}</p>
-        <p>Experto desde: {{ getDistance(expert.expert.creation_date) }}</p>
+        <div class="bioContainer">
+          <h3>BIO:</h3>
+          <p>{{ expert.expert.profile_bio }}</p>
+        </div>
+
+        <div>
+          <h3>Lenguajes:</h3>
+          <div class="languagesContainer">
+            <div class="languageName" v-for="language in expert.language" :key="language.id">
+              <img class="languageImage" :src="getImageName(language.image)" />
+              <p class="accesibilityTxt">{{ language.language }}</p>
+            </div>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { format, formatDistance } from "date-fns";
-import es from "date-fns/locale/es";
-
-import { config, ENDPOINT } from "../utils/helpers";
+import api from "@/api/api";
 
 export default {
   name: "Experts",
@@ -42,21 +54,15 @@ export default {
   },
 
   methods: {
-    getDistance(date) {
-      return formatDistance(new Date(date), new Date(), { locale: es });
-    },
     getImageName(name) {
       return process.env.VUE_APP_STATIC + name;
     },
-    //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD
+    //TRAIGO TODAS LOS EXPETOS DESDE LA API
     async getExperts() {
       try {
-        const response = await axios.get(ENDPOINT + "/experts");
-
-        this.experts = response.data.data;
+        this.experts = await api.getAllExperts();
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
+        console.error(error);
       }
     },
   },
@@ -67,9 +73,137 @@ export default {
 </script>
 
 <style scoped>
-.avatar {
+.title {
+  margin: 3rem;
+}
+h3 {
+  margin-bottom: 0;
+}
+ul.allExpContainer {
+  margin-bottom: 2rem;
+}
+
+.allExpContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+.expertContainer {
+  border-radius: 0.5rem;
+  list-style: none;
+  background-color: var(--regularColor);
+  padding: 1rem;
+  width: 90%;
+  margin-bottom: 1.5rem;
+}
+.autorInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 1rem;
+}
+.expertAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50px;
+  margin: 1.5rem;
+}
+.bioContainer {
+  margin: 1.5rem 0;
+}
+.languageImage {
   width: 48px;
   height: 48px;
-  border-radius: 24px;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.languagesContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+  align-content: center;
+  width: 100%;
+  margin: 1rem auto;
+}
+.languageName {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media only screen and (min-width: 500px) {
+  .allExpContainer {
+    text-align: left;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-around;
+    margin: 1rem;
+    max-width: 90vw;
+    margin: 0 auto;
+  }
+  .container {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+  }
+  .expertContainer {
+    width: 45%;
+    flex-grow: 0;
+  }
+  .languageImage {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.25rem;
+    margin-right: 1rem;
+  }
+  .autorInfo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+  }
+  .expertAvatar {
+    width: 80px;
+    height: 80px;
+    margin: 1rem 1rem 0 0;
+  }
+  .languagesContainer {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+@media only screen and (min-width: 900px) {
+  .allExpContainer {
+    max-width: 90vw;
+    margin: 0 auto;
+  }
+  .expertContainer {
+    width: 42%;
+    padding: 1.5rem;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .allExpContainer {
+    max-width: 90vw;
+    margin: 5rem auto;
+  }
+  .expertContainer {
+    width: 28%;
+    padding: 1.5rem;
+  }
 }
 </style>

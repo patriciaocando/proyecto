@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <MenuCustom />
+  <div class="publicLayout">
+    <MenuCustom @logout="logOut" />
     <main class="main">
       <slot />
     </main>
@@ -14,8 +14,14 @@ import FooterCustom from "@/components/FooterCustom.vue";
 export default {
   name: "Public",
   components: { MenuCustom, FooterCustom },
+  methods: {
+    logOut() {
+      let currentRoute = this.$route.name;
+      this.$emit("logout", currentRoute);
+    },
+  },
 };
 </script>
 
-<style>
+<style scoped>
 </style>

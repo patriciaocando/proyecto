@@ -29,10 +29,10 @@ export const config = {
 
 //GUARDAR EL LOCALSTORAGE EL JSONWEBTOKEN
 //Bearer porador del token
-export function setAuthToken(token) {
+/* export function setAuthToken(token) {
   axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   localStorage.setItem("AUTH_TOKEN_KET", token);
-}
+} */
 
 //RECUPERAR EL  TOKEN DEL LOCALSTORAGE
 export function getAuthToken() {
@@ -83,10 +83,10 @@ export function isLoggedIn() {
 }
 
 //LOGOUT
-export function logout() {
+/* export function logout() {
   axios.defaults.headers.common["Authorization"] = "";
   localStorage.removeItem("AUTH_TOKEN_KET");
-}
+} */
 
 //FUNCION DE ALERT
 export function alertFunction(icon, title, text) {

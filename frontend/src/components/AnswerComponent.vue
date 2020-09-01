@@ -1,43 +1,44 @@
 <template>
   <div>
-    <div v-for="(answer, index) in answers" :key="answer.id">
-      <question :question="answer" />
+    <div class="answerContent" v-for="(answer, index) in answers" :key="answer.id">
+      <question :question="answer" :route="route" />
 
-      <div class="answerContent">
-        <div class="currentAnswer" v-show="hideAnswer">
-          <p>{{ answer.answer }}</p>
+      <div class="currentAnswer" v-show="hideAnswer">
+        <span>
+          <button id="editButton" @click="activateEdition(index)">EDITAR</button>
+        </span>
 
-          <div class="metaDataAnswr">
-            <p class="accesibilityTxt">
-              RESPONDIDA: {{ getFormat(answer.respond) }} | Hace:
-              {{ getDistance(answer.respond) }}
-            </p>
-          </div>
+        <p>{{ answer.answer }}</p>
 
-          <div class="ratingStyle">
-            <div style="display:inline-block;">
-              <star-rating
-                :rating="parseInt(answer.rating)"
-                read-only
-                active-color="var(--blue)"
-                :star-size="20"
-              ></star-rating>
-            </div>
+        <div class="metaDataAnswr">
+          <p class="accesibilityTxt">
+            RESPONDIDA: {{ answer.respond | getFormat }} | Hace:
+            {{ answer.respond | getDistance }}
+          </p>
+        </div>
 
-            <button id="editButton" @click="activateEdition( index)">EDITAR</button>
+        <div class="ratingStyle">
+          <div style="display:inline-block;" @click="alertRating">
+            <star-rating
+              :rating="parseInt(answer.rating)"
+              read-only
+              active-color="var(--blue)"
+              :star-size="20"
+            ></star-rating>
           </div>
         </div>
-        <!--EDITAR RESPUESTA-->
-        <div v-show="!hideAnswer" v-if="selectedAnswer === index" class="answerEdit">
-          <div>
-            <textarea id="answer" type="text" name="textAnswer" v-model="newAnswer"></textarea>
-          </div>
-          <div class="buttonsContainer">
-            <button id="button3" @click="deleteAnswer(answer.id)">Borrar respuesta</button>
-            <div class="buttonsInsideContainer">
-              <button @click="postEditedAnswer(answer.id)">GUARDAR</button>
-              <button class="cancelButton" @click="cancelRequest()">CANCELAR</button>
-            </div>
+      </div>
+
+      <!--EDITAR RESPUESTA-->
+      <div v-show="!hideAnswer" v-if="selectedAnswer === index" class="answerEdit">
+        <div>
+          <textarea type="text" name="textAnswer" v-model="newAnswer"></textarea>
+        </div>
+        <div class="buttonsContainer">
+          <button class="deleteButton" @click="deleteAnswer(answer.id)">Borrar respuesta</button>
+          <div class="buttonsInsideContainer">
+            <button @click="postEditedAnswer(answer.id)">GUARDAR</button>
+            <button class="cancelButton" @click="cancelRequest()">CANCELAR</button>
           </div>
         </div>
       </div>
@@ -47,9 +48,8 @@
 
 <script>
 import starrating from "vue-star-rating";
-import { format, formatDistance } from "date-fns";
-import es from "date-fns/locale/es";
 import question from "@/components/Question.vue";
+import { alertFunction } from "../utils/helpers";
 
 export default {
   name: "AnswerComponent",
@@ -73,13 +73,20 @@ export default {
   props: {
     answers: Array,
   },
+  computed: {
+    route() {
+      return this.$route.name;
+    },
+  },
   methods: {
-    getFormat(date) {
-      return format(new Date(date), "dd/M/yyyy", { locale: es });
+    alertRating() {
+      alertFunction(
+        "warning",
+        "Upss!",
+        "No puedes votar tus propias respuestas"
+      );
     },
-    getDistance(date) {
-      return formatDistance(new Date(date), new Date(), { locale: es });
-    },
+
     activateEdition(index) {
       this.selectedAnswer = index;
       this.editAnswer = true;
@@ -91,7 +98,7 @@ export default {
         id,
         currentAnswer: this.newAnswer,
       };
-      console.log(editedAnswerData);
+
       this.$emit("editedAnswer", editedAnswerData);
     },
 
@@ -114,41 +121,14 @@ export default {
   flex-direction: column;
   background-color: var(--ligthColor);
   padding-bottom: 1rem;
-}
-
-#editButton {
-  background-image: url("../assets/icons/EDITAR.svg");
-  background-repeat: no-repeat;
-  background-position: 3% 50%;
-  outline: 0;
-  margin: 0;
-  background-color: white;
-  color: var(--mediumColor);
-}
-
-#button3 {
-  background-image: url("../assets/icons/BORRAR.svg");
-  background-repeat: no-repeat;
-  background-position: 5% 50%;
-  background-size: 16px;
-  margin: 0;
-}
-
-.buttonsContainer,
-.buttonsInsideContainer {
-  margin: 0 1rem;
-  display: flex;
-  flex-wrap: nowrap;
-  flex-direction: column;
-  align-items: space-around;
-  justify-content: space-around;
-  align-content: stretch;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
 }
 
 .currentAnswer,
 .answerEdit {
   background-color: white;
-  padding: 1rem;
+  padding: 2rem;
   margin: 1rem;
   -webkit-box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
   -moz-box-shadow: 0px 13px 14px -13px rgba(173, 173, 173, 0.64);
@@ -171,16 +151,6 @@ export default {
   justify-content: space-between;
 }
 
-#answer {
-  width: 90%;
-  padding: 1rem;
-  margin: 0.5rem;
-  border: 1px solid var(--regularColor);
-  font-family: "Open Sans";
-  font-weight: var(--semiBold);
-  font-size: 16px;
-}
-
 @media only screen and (min-width: 600px) {
   .metaDataAnswr {
     display: flex;
@@ -198,11 +168,10 @@ export default {
 
   .buttonsContainer {
     margin: 0;
-
     flex-direction: row;
     align-items: center;
   }
-  #button3 {
+  .deleteButton {
     background-position: 3% 50%;
     flex-grow: 1;
   }
@@ -212,9 +181,9 @@ export default {
     align-items: center;
     justify-content: space-between;
   }
-  #button3 {
+  .deleteButton {
     background-position: 1% 50%;
-    padding: 0 2rem;
+    padding: 2rem;
     flex-grow: 0;
   }
 }

@@ -1,22 +1,92 @@
 <template>
   <div id="app">
-    <component :is="layout">
-      <router-view />
+    <component :is="layout" class="principal" @logout="logOut">
+      <router-view @doLogin="getUserData" />
     </component>
+    <!--  <footercustom class="footer" /> -->
   </div>
 </template>
 
 <script>
-//IMPORTO MENU
-//import menucustom from "@/components/MenuCustom.vue";
+//STORAGE DE LOS DATOS DE USUARIO
+import userData from "@/dataStorage/userData";
+import api from "@/api/api";
 const publicLayout = "public";
 
 export default {
   name: "App",
-  components: {},
+  data() {
+    return {
+      userId: "",
+      token: "",
+      sharedStore: userData.state,
+    };
+  },
+
   computed: {
     layout() {
       return (this.$route.meta.layout || publicLayout) + "-layout";
+    },
+    isAuthenticated() {
+      return this.token !== "";
+    },
+  },
+  created() {
+    let token = localStorage.getItem("AUTH_TOKEN_KET");
+
+    if (token !== null) {
+      this.token = token;
+      api.setAuthToken(this.token);
+      const response = api.getUserTokenId(this.token);
+      this.userId = response.id;
+      this.setData();
+    }
+  },
+  methods: {
+    async getUserData(token) {
+      this.token = token;
+      localStorage.setItem("AUTH_TOKEN_KET", this.token);
+      const response = await api.getUserTokenId(this.token);
+      this.userId = response.id;
+      this.setData();
+    },
+
+    async setData() {
+      const user = await api.getUserProfile(this.userId);
+
+      console.log(user);
+
+      this.sharedStore.id = this.userId;
+      this.sharedStore.token = this.token;
+      this.sharedStore.username = user.username;
+      this.sharedStore.role = user.role;
+      this.sharedStore.avatar = process.env.VUE_APP_STATIC + user.avatar;
+      this.sharedStore.email = user.email;
+      this.sharedStore.name = user.name;
+      this.sharedStore.lastname = user.lastName;
+      this.sharedStore.profile = user.profile;
+      this.sharedStore.isLogged = this.isAuthenticated;
+
+      this.$router.push({ name: "Dashboard" });
+    },
+    logOut(currentRoute) {
+      this.sharedStore.id = null;
+      this.sharedStore.role = null;
+      this.sharedStore.token = null;
+      this.sharedStore.username = null;
+      this.sharedStore.avatar = null;
+      this.sharedStore.email = null;
+      this.sharedStore.name = null;
+      this.sharedStore.lastname = null;
+      this.sharedStore.profile = null;
+      this.sharedStore.isLogged = false;
+      api.logout();
+
+      if (currentRoute !== "Home") {
+        this.$router.push({ name: "Home" });
+      } else {
+        location.reload();
+      }
     },
   },
 };
@@ -24,6 +94,11 @@ export default {
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,600;0,700;0,800;1,400&display=swap");
+
+/* html,
+body {
+  height: 100%;
+} */
 
 * {
   margin: 0;
@@ -46,6 +121,10 @@ export default {
   --semiBold: 600;
   --bold: 700;
   --extraBold: 800;
+  font-size: 12px;
+}
+.principal {
+  flex: 1 0 auto;
 }
 
 #app {
@@ -56,6 +135,20 @@ export default {
   color: var(--textColor);
   font-weight: var(--semiBold);
   line-height: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+/* .footer {
+  flex-shrink: 0;
+} */
+
+/*contenedor para vistas de dashboards */
+.container {
+  width: 90%;
+  margin: 0 auto;
+  padding: 80px 2rem 4rem 2rem;
+  text-align: left;
 }
 
 .ligth {
@@ -63,7 +156,7 @@ export default {
 }
 
 h1 {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   line-height: 2rem;
   letter-spacing: 0.03rem;
   color: var(--darkColor);
@@ -79,11 +172,12 @@ h2 {
 
 h3 {
   font-weight: var(--bold);
-  font-size: 0.8rem;
+  font-size: 1rem;
   line-height: 1.2rem;
   letter-spacing: 0.03rem;
   color: var(--darkColor);
   text-transform: uppercase;
+  margin-bottom: 1rem;
 }
 h4 {
   font-weight: var(--regular);
@@ -94,7 +188,8 @@ h4 {
 
 .accesibilityTxt {
   font-weight: var(--semiBold);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
   letter-spacing: 0.12px;
   color: var(--textColor);
 }
@@ -108,11 +203,72 @@ h4 {
 }
 
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 24px;
   margin: 0.5rem;
   margin-right: 0.5rem;
+}
+
+.emptyState {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+/* ///////////// BOTONES //////////////*/
+#registerButton {
+  width: 80px;
+  /*texto*/
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06rem;
+  font-weight: var(--semiBold);
+  color: white;
+  /*fondo*/
+  border: none;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  background-color: var(--blue);
+  /*separacion*/
+  padding: 1rem 2rem;
+  margin-top: 2rem;
+}
+.deleteButton {
+  background-image: url("./assets/icons/BORRAR.svg");
+  background-repeat: no-repeat;
+  background-position: 5% 50%;
+  background-size: 16px;
+  margin: 0;
+  padding-left: 2rem;
+  background-color: transparent;
+  color: var(--darkColor);
+}
+
+.deleteButton:hover {
+  background-image: url("./assets/icons/open-basket.svg");
+  background-repeat: no-repeat;
+  background-position: 3% 50%;
+  background-size: 16px;
+  margin: 0;
+  padding-left: 2rem;
+  background-color: transparent;
+  color: var(--darkColor);
+}
+
+#editButton {
+  background-image: url("./assets/icons/EDITAR.svg");
+  background-repeat: no-repeat;
+  background-position: 3% 50%;
+  outline: 0;
+  margin: 0;
+  background-color: white;
+  color: var(--mediumColor);
+  padding: 1rem 1rem 1rem 1.8rem;
 }
 
 button {
@@ -125,7 +281,28 @@ button {
   /*fondo*/
   border: none;
   text-decoration: none;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
+  background-color: var(--blue);
+  /*separacion*/
+  padding: 1rem 1.5rem;
+  margin: 1rem 0.5rem;
+  border: none;
+}
+button:focus {
+  outline: none;
+}
+
+.button {
+  /*texto*/
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06rem;
+  font-weight: var(--semiBold);
+  color: white;
+  /*fondo*/
+  border: none;
+  text-decoration: none;
+  border-radius: 0.5rem;
   background-color: var(--blue);
   /*separacion*/
   padding: 1rem 1.5rem;
@@ -140,7 +317,7 @@ button {
 #button3 {
   color: var(--darkColor);
   background-color: white;
-  margin: 0.5rem;
+  margin: 1rem 0.5rem 0.5rem 0.5rem;
   padding: 0.5rem;
 }
 
@@ -157,11 +334,17 @@ button {
   letter-spacing: 0.08rem;
 }
 
+/*/////////////////// INPUTS ///////////////// */
 input {
-  padding: 0.4rem 0.5rem;
+  font-family: "Open Sans";
+  font-weight: var(--semiBold);
+  color: var(--textColor);
+  font-size: 1rem;
+  line-height: 1.3;
+  padding: 0.8rem 1rem;
   height: 1.2rem;
   border: 1px solid var(--regularColor);
-  margin: 0.5rem 0.5rem;
+  margin: 0.5rem 0;
   border-radius: 4px;
   background-color: white;
 }
@@ -171,7 +354,44 @@ input:focus {
   border-radius: 4px;
 }
 
+textarea {
+  font-family: "Open Sans";
+  font-size: 1rem;
+  line-height: 1.3;
+  color: var(--textColor);
+  font-weight: var(--semiBold);
+  width: 90%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--regularColor);
+  height: 20rem;
+}
+
+textarea:focus {
+  outline: none;
+  border-radius: 4px;
+}
+
+/*///////// TITULOS //////////*/
+#sectionTitle h1,
+#sectionTitle h2 {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+#aviableLanguages {
+  color: var(--textColor);
+  width: 100%;
+  height: 2rem;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  background-color: white;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
 .languageStyle {
+  display: block;
   background-color: var(--mediumColor);
   color: var(--ligthColor);
   font-size: 12px;
@@ -182,6 +402,36 @@ input:focus {
   padding: 0.2rem 1rem;
   margin: 0.5rem 0;
   border-radius: 4px;
+}
+
+#languageStyle {
+  display: block;
+  text-transform: none;
+  font-size: 12px;
+  font-weight: var(--semiBold);
+  text-align: center;
+  letter-spacing: 0.24px;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem;
+  border-radius: 4px;
+}
+
+#languageStyle:focus {
+  outline: none;
+}
+.buttonsContainer,
+.buttonsInsideContainer {
+  margin: 0 1rem;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: space-around;
+  justify-content: space-around;
+  align-content: stretch;
+}
+
+.titleInput {
+  width: 90%;
 }
 
 .javascript {
@@ -232,8 +482,25 @@ input:focus {
   .languageStyle {
     margin: 0 0.5rem;
   }
+  .container {
+    margin: 2rem auto;
+  }
 }
-@media only screen and (min-width: 1200px) {
+
+@media only screen and (min-width: 900px) {
+  .languageStyle {
+    margin: 0 0.5rem;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  /* .container {
+    width: 70%;
+    margin: 5rem 3rem 0 0;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    text-align: left;
+  } */
 }
 
 /* @media only screen and (max-width:600px)

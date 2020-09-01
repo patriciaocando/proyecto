@@ -17,6 +17,7 @@
 
       <!-- FORMULARIO DE REGISTRO -->
       <div class="registerInputs">
+        <h2>Regístrate:</h2>
         <h3>EMAIL:</h3>
         <input type="email" v-model="email" placeholder="miemail@tutorships.com" />
         <h3>NOMBRE DE USUARIO:</h3>
@@ -52,15 +53,17 @@
         <img src="../assets/logoTutorShips.png" alt="logo-tutorships" />
       </figure>
       <h1>¡Revisa tu email!</h1>
-      <button @click="$router.push('/login')">IR AL login</button>
+      <router-link class="button" :to="{ name: 'Home' }">IR AL HOME</router-link>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+/* import axios from "axios"; */
 import Swal from "sweetalert2";
-import { alertFunction, ENDPOINT, config } from "../utils/helpers";
+import api from "@/api/api";
+import { alertFunction } from "../utils/helpers";
+/* import { alertFunction, ENDPOINT, config } from "../utils/helpers"; */
 
 export default {
   name: "Register",
@@ -112,12 +115,8 @@ export default {
         this.coment = false;
 
         try {
-          const response = await axios.post(
-            ENDPOINT + "/new-user",
-            registerData
-          );
-
-          this.validationUrl = response.data.activationUrl;
+          const response = await api.newUser(registerData);
+          this.validationUrl = response.activationUrl;
 
           await alertFunction(
             "success",
@@ -128,9 +127,8 @@ export default {
           this.validationShow = true;
           this.registerShow = false;
         } catch (error) {
-          console.log(error);
           this.showError = true;
-          this.errorMessage = error.response.data.message;
+          this.errorMessage = error;
         }
       }
     },
@@ -139,6 +137,7 @@ export default {
       this.username = "";
       this.password = "";
       this.confirmpassword = "";
+      this.$router.push({ name: "Home" });
     },
   },
 };
