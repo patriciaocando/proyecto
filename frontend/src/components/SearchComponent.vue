@@ -102,7 +102,7 @@ export default {
   },
   computed: {
     response() {
-      return this.newSearchData.response;
+      return this.newSearchData.error;
     },
     newSearchView() {
       return this.newSearchData.newSearchView;

@@ -6,9 +6,9 @@ export const ENDPOINT = "http://localhost:3000";
 //instancia
 const authInstance = axios.create({
   baseURL: ENDPOINT,
-  /* headers: {
+  headers: {
     Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-  }, */
+  },
 });
 
 export default {
@@ -27,7 +27,6 @@ export default {
         throw error.response.data.message;
       });
   },
-
   setAuthToken: function(token) {
     authInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   },
@@ -50,21 +49,14 @@ export default {
       };
     }
   },
+  //TRAER LA INFO DEL USUARIO
   getUserProfile: async function(id) {
-    try {
-      const dataUser = await axios
-        .get(ENDPOINT + "/users/profile/" + id, {
-          headers: {
-            Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-          },
-        })
-        .catch((error) => {
-          throw error.response.data.message;
-        });
-      return dataUser.data.data;
-    } catch (error) {
-      throw error;
-    }
+    const dataUser = await authInstance
+      .get("/users/profile/" + id)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return dataUser.data.data;
   },
   //REGISTRAR USUARIO
   newUser: async function(data) {
@@ -75,19 +67,13 @@ export default {
       });
     return response.data;
   },
-
   //ACTUALIZAR PERFIL DE USUARIO
   updateUserProfile: async function(id, formData) {
-    const response = await axios
-      .put(ENDPOINT + "/users/edit-profile/" + id, formData, {
-        headers: {
-          Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-        },
-      })
+    const response = await authInstance
+      .put("/users/edit-profile/" + id, formData)
       .catch((error) => {
         throw error.response.data.message;
       });
-    return response;
   },
   //ACTUALIZAR CONTRASEÑA DE USUARIO
   updateUserpass: async function(id, data) {
@@ -104,29 +90,24 @@ export default {
   },
 
   ///////////////*  LENGUAJES  *//////////////////////
+
   //TRAER LOS LENGUAJES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
   getLanguages: async function() {
-    try {
-      const response = await authInstance.get("/languages");
-      return response.data.data;
-    } catch (error) {
-      return error.response.data.message;
-    }
+    const response = await authInstance.get("/languages").catch((error) => {
+      throw error.response.data.message;
+    });
+    return response.data.data;
   },
   //ENVIAR SOLICTUD DE EXPERTO AL ADMIN
   expertRequest: async function(languages) {
-    try {
-      const response = await authInstance
-        .post("/users/upgrade-user", {
-          languages,
-        })
-        .catch((error) => {
-          throw error.response.data.message;
-        });
-      return response.data.data;
-    } catch (error) {
-      return error.response.data.message;
-    }
+    const response = await authInstance
+      .post("/users/upgrade-user", {
+        languages,
+      })
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
   },
   //ASOCIAR UN NUEVO LENGUAJE
   newLanguageExpert: async function(languageId) {
@@ -137,8 +118,6 @@ export default {
       });
     return response.data.data;
   },
-
-  //
 
   ///////////////*  PREGUNTAS  *//////////////////////
   //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD
@@ -155,41 +134,64 @@ export default {
   },
   //PREGUNTAS DE USUARIO
   userQuestions: async function() {
-    const response = await axios
-      .get(ENDPOINT + "/my-questions", {
-        headers: {
-          Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-        },
-      })
+    const response = await authInstance.get("/my-questions").catch((error) => {
+      throw error.response.data.message;
+    });
+    return response.data.data;
+  },
+  //NUEVA PREGUNTA
+  newQuestion: async function(data) {
+    const response = await authInstance
+      .post("/new-question", data)
       .catch((error) => {
         throw error.response.data.message;
       });
     return response.data.data;
   },
-
+  //EDITAR PREGUNTA
+  editQuestion: async function(idQuestion, data) {
+    await authInstance
+      .put("/edit-question/" + idQuestion, data)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+  },
+  //BORRAR PREGUNTA
+  deleteQuestion: async function(idQuestion) {
+    const response = await authInstance
+      .delete("/delete-question/" + idQuestion)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
+  },
+  //PREGUNTAS PARA EXPERTO
+  questionsToAnswer: async function() {
+    const response = await authInstance
+      .get("/questions/to-answer")
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
+  },
   ///////////////*  RESPUESTAS  *//////////////////////
   //RATE ANSWER
   postRating: async function(data) {
-    try {
-      const response = await authInstance
-        .post("/rating/answer/" + data.id, {
-          rating: data.rating,
-        })
-        .catch((error) => {
-          throw error.response.data.message;
-        });
-      return response;
-    } catch (error) {
-      return error.response.data.message;
-    }
-  },
-  getAnswers: async function(idQuestion) {
-    const response = await axios
-      .get(ENDPOINT + "/answer/" + idQuestion, {
-        headers: {
-          Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-        },
+    console.log(data);
+    const response = await authInstance
+      .post("/rating/answer/" + data.id, {
+        rating: data.rating,
       })
+      .catch((error) => {
+        console.log(error);
+        throw error.response.data.message;
+      });
+    return response;
+  },
+
+  getAnswers: async function(idQuestion) {
+    const response = await authInstance
+      .get("/answer/" + idQuestion)
       .catch((error) => {
         throw error.response.data.message;
       });

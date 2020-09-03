@@ -18,14 +18,17 @@
         @newSearch="newSearch"
       />
       <p v-show="searchMessage">Resultado de tu búsqueda</p>
-      <showquestions
+
+      <getquestions
         v-show="isResult"
         id="questionsBody"
         :questions="questions"
         :answers="answers"
         @showAnswers="getAnswersById"
-        @rateAnswer="rateAnswer"
+        @newVote="newVote"
       />
+
+      <!--     @rateAnswer="rateAnswer" -->
     </div>
 
     <div id="expert" class="bannerContainer">
@@ -47,16 +50,15 @@
 <script>
 //STORAGE DE LOS DATOS DE USUARIO
 import userData from "@/dataStorage/userData";
-
 import api from "@/api/api.js";
-import showquestions from "@/components/GetQuestions.vue";
+import getquestions from "@/components/GetQuestions.vue";
 import searchcomponent from "@/components/SearchComponent.vue";
 import { alertFunction } from "../utils/helpers";
 
 export default {
   name: "Home",
   components: {
-    showquestions,
+    getquestions,
     searchcomponent,
   },
   data() {
@@ -85,17 +87,14 @@ export default {
       this.searchMessage = false;
       this.getQuestions();
     },
-    async rateAnswer(data) {
-      try {
-        const response = await api.postRating(data);
-        alertFunction(
-          "success",
-          "Ranking",
-          `¡Has Votado con ${data.rating} puntos!`
-        );
-      } catch (error) {
-        await alertFunction("error", "Opss!", `Ya has votado esta respuesta`);
-      }
+    newVote(data) {
+      alertFunction(
+        "success",
+        "Ranking",
+        `¡Has Votado con ${data.rating} puntos!`
+      );
+      /* this.getAnswersById(data.id);
+      console.log("me ejecuto"); */
     },
     collectParams(componentParams) {
       this.queryParams = componentParams;
@@ -103,8 +102,24 @@ export default {
     },
     //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD
     async getQuestions(componentParams) {
-      let response = await api.getQuestions(componentParams);
-      if (response === "No hay resultados que coincidan con tu búsqueda") {
+      try {
+        let response = await api.getQuestions(componentParams);
+        this.searchMessage = false;
+        this.questions = response;
+        await this.getLanguages();
+      } catch (error) {
+        if (error === "No hay resultados que coincidan con tu búsqueda") {
+          this.newSearchData = {
+            error,
+            newSearchView: true,
+          };
+          this.isResult = false;
+        }
+        console.error(error);
+      }
+      //falta trcatch
+
+      /*   if (response === "No hay resultados que coincidan con tu búsqueda") {
         this.newSearchData = {
           response,
           newSearchView: true,
@@ -114,7 +129,7 @@ export default {
         this.searchMessage = false;
         this.questions = response;
         await this.getLanguages();
-      }
+      } */
     },
     //TRAER LAS RESPUESTA DE LA PREGUNTA SELECCIONADA SI ES USUARIO LOGUEADO
     async getAnswersById(idQuestion) {

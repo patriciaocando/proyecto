@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <vue-headful title="TutorShip" description="TutorShip" />
     <component :is="layout" class="principal" @logout="logOut">
       <router-view @doLogin="getUserData" />
     </component>
@@ -121,7 +122,7 @@ body {
   --semiBold: 600;
   --bold: 700;
   --extraBold: 800;
-  font-size: 12px;
+  font-size: 13px;
 }
 .principal {
   flex: 1 0 auto;
@@ -222,7 +223,6 @@ h4 {
 
 /* ///////////// BOTONES //////////////*/
 #registerButton {
-  width: 80px;
   /*texto*/
   font-size: 1rem;
   text-transform: uppercase;
@@ -306,7 +306,7 @@ button:focus {
   background-color: var(--blue);
   /*separacion*/
   padding: 1rem 1.5rem;
-  margin: 1rem 0.5rem;
+  /* margin: 1rem 0.5rem; */
 }
 
 #button2 {

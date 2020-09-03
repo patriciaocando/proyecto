@@ -23,6 +23,7 @@ export default {
     async validationUser() {
       let url = window.location.href;
       let registrationCode = url.split("?");
+      console.log(this.$route.params);
 
       try {
         const response = await axios.get(

@@ -55,6 +55,8 @@ export default {
 .navLinks button#closeMenu {
   background-color: transparent;
   padding: 0;
+
+  margin: 2rem 0;
 }
 .menuContainer {
   background-color: var(--darkColor);
@@ -64,7 +66,7 @@ export default {
 #button2 {
   width: 130px;
   text-align: center;
-  margin-top: 5rem;
+  margin: 3rem;
 }
 #nav {
   padding: 1.5rem 3rem;
@@ -114,7 +116,7 @@ export default {
 @media only screen and (min-width: 800px) {
   #button2 {
     margin: 0 2rem;
-    width: 80px;
+    /* width: 80px; */
   }
   .hideMenu {
     display: none;

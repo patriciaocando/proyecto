@@ -8,6 +8,8 @@
         @editquestion="editQuestionId"
         @showmethsanswer="showmethsanswer"
         :index="index"
+        @questionDeleted="questionDeleted"
+        @questionEdited="questionEdited"
       />
       <button
         v-if="!isUser"
@@ -20,7 +22,7 @@
         class="answerContent"
         v-if="index === answer"
         :answers="answers"
-        @newVote="getRating"
+        @newVote="newVote"
       />
     </div>
   </div>
@@ -64,8 +66,14 @@ export default {
   },
 
   methods: {
-    getRating(data) {
-      this.$emit("rateAnswer", data);
+    questionEdited() {
+      this.$emit("questionEdited");
+    },
+    questionDeleted() {
+      this.$emit("questionDeleted");
+    },
+    newVote(data) {
+      this.$emit("newVote", data);
     },
     editQuestionId(id) {
       this.$emit("editquestion", id);

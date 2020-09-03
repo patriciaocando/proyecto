@@ -252,6 +252,7 @@ export default {
   background-image: url("../assets/icons/experto.svg");
   background-repeat: no-repeat;
   background-position: 1% 50%;
+  background-size: 16px;
   outline: 0;
   margin: 0;
 }
@@ -278,7 +279,7 @@ export default {
 
 a#questionButton {
   /*texto*/
-  font-size: 1rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   font-weight: var(--semiBold);
   color: white;
@@ -290,6 +291,7 @@ a#questionButton {
   /*separacion*/
   padding: 1rem 2rem;
   margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .responsiveMenu {
@@ -353,7 +355,7 @@ a#questionButton {
   #lateralMenu a {
     color: var(--darkColor);
     text-decoration: none;
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   .cancelButton {

@@ -21,7 +21,11 @@
           Selecciona uno o varios lenguajes en los que quieres ser experto y
           envíanos tu solicitud.
         </p>
-        <languagesselector :languages="bbddLanguages" @languageId="getComponentLanguage" />
+        <languagesselector
+          :languages="bbddLanguages"
+          @languageId="getComponentLanguage"
+          @disableErrorMsg="disableErrorMsg"
+        />
         <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
 
         <div class="buttonsContent">
@@ -64,7 +68,9 @@ export default {
         this.errorMessage = error;
       }
     },
-
+    disableErrorMsg() {
+      this.showError = false;
+    },
     //TRAER EL LENGUAJE ESCOGIDO DEL COMPONENTE/SELECT LENGUAJES
     getComponentLanguage(languageId) {
       this.choosenLanguages = languageId;

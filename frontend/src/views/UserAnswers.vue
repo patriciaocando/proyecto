@@ -80,7 +80,9 @@ export default {
           config
         );
 
-        location.reload();
+        alertFunction("success", "Editada!", "Tu respuesta ha sido editada.");
+        //location.reload();
+        await this.getAnswers();
       } catch (error) {
         this.showError = true;
         this.errorMessage = error.response.data.message;
@@ -102,8 +104,8 @@ export default {
       }
     },
   },
-  async created() {
-    await this.getAnswers();
+  created() {
+    this.getAnswers();
   },
 };
 </script>

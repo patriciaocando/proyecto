@@ -14,24 +14,16 @@
             {{ answer.respond | getDistance }}
           </p>
 
-          <div
-            class="ratingStyle"
-            @mouseleave="showCurrentRating(0)"
-            @click="getAnswerId(answer.id)"
-            style="display:inline-block;"
-          >
-            <star-rating
-              :rating="parseInt(answer.rating)"
-              @current-rating="showCurrentRating"
-              @rating-selected="setCurrentSelectedRating"
-              :increment="1"
-              :max-rating="5"
-              inactive-color="var(--regularColor)"
-              active-color="var(--blue)"
-              :star-size="20"
-            ></star-rating>
-          </div>
-          <!-- <h4>({{ answer.total_votes -1 }})</h4> -->
+          <star-rating
+            :rating="parseInt(answer.rating)"
+            @rating-selected="setRating"
+            @current-rating="setAnswerId(answer.id)"
+            :increment="1"
+            :max-rating="5"
+            inactive-color="var(--regularColor)"
+            active-color="var(--blue)"
+            :star-size="20"
+          ></star-rating>
         </div>
       </div>
     </div>
@@ -40,6 +32,9 @@
 
 <script>
 import starrating from "vue-star-rating";
+import api from "@/api/api";
+
+import { alertFunction } from "../utils/helpers";
 
 export default {
   name: "getanswer",
@@ -49,27 +44,30 @@ export default {
   data() {
     return {
       rating: 0,
-      idAnswerRate: "",
-      currentSelectedRating: "",
+      answerId: "",
     };
   },
 
   methods: {
-    getAnswerId(id) {
-      this.idAnswerRate = id;
+    setAnswerId(id) {
+      this.answerId = id;
     },
-    showCurrentRating: function(rating) {
-      this.currentRating = rating === 0 ? this.currentSelectedRating : rating;
-    },
-    setCurrentSelectedRating(rating) {
-      this.currentSelectedRating = rating;
-      let data = {
-        id: this.idAnswerRate,
-        rating,
-      };
-      this.$emit("newVote", data);
-    },
+    async setRating(rating) {
+      this.rating = rating;
 
+      try {
+        let data = {
+          id: this.answerId,
+          rating: this.rating,
+        };
+        const response = await api.postRating(data);
+
+        this.$emit("newVote", data);
+      } catch (error) {
+        console.log(error);
+        await alertFunction("error", "Opss!", `Ya has votado esta respuesta`);
+      }
+    },
     getImageName(name) {
       return process.env.VUE_APP_STATIC + name;
     },
