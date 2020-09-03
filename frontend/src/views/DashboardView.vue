@@ -313,7 +313,7 @@ export default {
   created() {
     this.getRole();
     this.getLanguages();
-    //this.getStudentQuestions();
+    this.getStudentQuestions();
   },
 };
 </script>
