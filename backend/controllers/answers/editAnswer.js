@@ -24,7 +24,7 @@ async function editAnswer(req, res, next) {
         U.name_user AS 'userExpert',
         U.avatar,
         LT.name_language AS 'Language',
-           COALESCE((SUM(UR.rating)/(COUNT(UR.id_answer)-1)) , 0) AS 'rating'
+        COALESCE((SUM(UR.rating)/(COUNT(UR.id_answer)-1)) , 0) AS 'rating'
     FROM answers A
     INNER JOIN questions Q ON A.id_question = Q.id
     INNER JOIN users U ON A.id_user_expert=U.id

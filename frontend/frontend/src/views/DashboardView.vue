@@ -22,11 +22,15 @@
       <router-link class="button" :to="{ name: 'NewQuestion' }"
         >Hacer pregunta</router-link
       >
-    </div> -->
+    </div>-->
 
     <div v-show="showResultSearch">
       <h3>RESULTADOS DE TU BÚSQUEDA:</h3>
-      <getquestions :questions="questionsResultSearch" />
+      <getquestions
+        :questions="questionsResultSearch"
+        :answers="answers"
+        @showAnswers="getAnswersById"
+      />
     </div>
 
     <div v-show="!showResultSearch" class="mainView">
@@ -37,33 +41,28 @@
         v-if="role === 'experto'"
         v-show="allQuestions"
         :questions="questionsToExpert"
-        @getQuestion="getQuestion"
       />
+      <!--  @getQuestion="getQuestion" -->
       <answerquestion
         v-show="!allQuestions"
         :question="question"
         @publishAnswer="publishAnswer"
         @cancelEdition="cancelEditAnswer"
       />
-      <!-- v-on:cancelEdition="cancelEdition" -->
-      <!--VISTA ADMIN-->
 
       <!--VISTA ESTUDIANTE-->
+
       <div>
-        <div>
-          <getquestions
-            v-if="role === 'estudiante'"
-            :questions="studentQuestions"
-            :answer="studentAnswers"
-            :count="count"
-            v-show="showQuestion"
-          />
-          <div class="emptyState" v-show="noQuestions">
-            <h2>¡Haz tu primera pregunta!</h2>
-            <router-link class="button" :to="{ name: 'NewQuestion' }"
-              >Hacer pregunta</router-link
-            >
-          </div>
+        <getquestions
+          v-if="role === 'estudiante'"
+          :questions="studentQuestions"
+          :answers="answers"
+          @showAnswers="getAnswersById"
+          @newVote="newVote"
+        />
+        <div class="emptyState" v-show="noQuestions">
+          <h2>¡Haz tu primera pregunta!</h2>
+          <router-link class="button" :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
         </div>
       </div>
     </div>
@@ -77,6 +76,9 @@ import getquestions from "@/components/GetQuestions.vue";
 //COMPONENTES PARA EXPERTO
 import answerquestion from "@/components/AnswerQuestion.vue";
 import showquestionstoexpert from "@/components/GetQuestionsToExpert.vue";
+
+///////////
+import userquestions from "@/views/UserQuestions.vue";
 
 //IMPORTAR UTILIDADES
 import axios from "axios";
@@ -100,6 +102,8 @@ export default {
     searchcomponent,
     showquestionstoexpert,
     answerquestion,
+    /////////////
+    userquestions,
   },
   data() {
     return {
@@ -116,6 +120,8 @@ export default {
 
       //Variable para interpolar los lenguajes en la busqueda
       languages: [],
+
+      answers: [],
 
       //Variable estudiante
       studentQuestions: [],
@@ -149,6 +155,9 @@ export default {
     token() {
       return this.sharedStore.token;
     },
+    route() {
+      return this.$route.name;
+    },
   },
 
   methods: {
@@ -157,9 +166,10 @@ export default {
       this.searchBar = true;
     },
     newSearch() {
-      this.isResult = true;
+      this.isResult = false;
       this.searchMessage = false;
-      this.getQuestions();
+      this.showResultSearch = false;
+      this.getRole();
     },
     //////////////////////////////////////////////////////
     //ENPOINTS GENERALES
@@ -175,27 +185,20 @@ export default {
         console.log("carga funcion de admin");
       }
     },
-
+    newVote(data) {
+      alertFunction(
+        "success",
+        "Ranking",
+        `¡Has Votado con ${data.rating} puntos!`
+      );
+      /* this.getAnswersById(data.id);
+      console.log("me ejecuto"); */
+    },
     //RECIBO LOS PARAMETROS DE BUSQUEDA DESDE MI COMPONENTE
-    async collectParams(componentParams) {
+    collectParams(componentParams) {
       this.showQuestion = false;
-      this.queryParams = componentParams;
-
       this.getQuestions(componentParams);
     },
-    //TRAER LOS LENGUAJES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
-    async getLanguages() {
-      try {
-        this.languages = await api.getLanguages();
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
-      }
-    },
-    //////////////////////////////////////////////////////
-    //ENPOINTS PARA ESTUDIANTE
-    //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD PARA HACER LA CONSULTA DE LA BUSQUEDA
-    //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD
     async getQuestions(componentParams) {
       try {
         let response = await api.getQuestions(componentParams);
@@ -213,14 +216,25 @@ export default {
         this.isResult = false;
       }
     },
+    //TRAER LOS LENGUAJES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
+    async getLanguages() {
+      try {
+        this.languages = await api.getLanguages();
+      } catch (error) {
+        this.showError = true;
+        this.errorMessage = error;
+      }
+    },
+    //////////////////////////////////////////////////////
+    //ENPOINTS PARA ESTUDIANTE
 
-    //DESDE LA BBDD
+    //LAS PREGUNTAS QUE HA HECHO EL ESTUDIANTE RECIENTEMENTE
     async getStudentQuestions() {
       try {
-        const response = await api.answersToRespond();
-        this.questions = response;
+        const response = await api.userQuestions();
+        this.studentQuestions = response;
 
-        if (this.questions.length === 0) {
+        if (this.studentQuestions.length === 0) {
           this.noQuestions = true;
         }
       } catch (error) {
@@ -228,24 +242,28 @@ export default {
         this.errorMessage = error;
       }
     },
-
+    //TRAER LAS RESPUESTA DE LA PREGUNTA SELECCIONADA SI ES USUARIO LOGUEADO
+    async getAnswersById(idQuestion) {
+      try {
+        this.answers = await api.getAnswers(idQuestion);
+      } catch (error) {
+        this.showError = true;
+        this.errorMessage = error;
+      }
+    },
     //////////////////////////////////////////////////////
     //ENPOINTS PARA EXPERTO
     //TRAIGO LAS PREGUNTAS QUE PUEDE RESPONDER EL EXPERTO
     async getQuestionsToAnswer() {
       try {
-        const response = await axios.get(ENDPOINT + "/questions/to-answer", {
-          headers: {
-            Authorization: this.token,
-          },
-        });
-        this.questionsToExpert = response.data.data;
+        const response = await api.questionsToAnswer();
+        this.questionsToExpert = response;
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
-    async getQuestion(id) {
+    /*   async getQuestion(id) {
       this.searchBar = false;
       try {
         const response = await axios.get(ENDPOINT + "/question/" + id, {
@@ -260,7 +278,7 @@ export default {
         this.showError = true;
         this.errorMessage = error.response.data.message;
       }
-    },
+    }, */
     async publishAnswer(data) {
       try {
         const response = await axios.post(
@@ -283,10 +301,19 @@ export default {
         this.errorMessage = error.response.data.message;
       }
     },
+    async getAnswersById(idQuestion) {
+      try {
+        this.answers = await api.getAnswers(idQuestion);
+      } catch (error) {
+        this.showError = true;
+        this.errorMessage = error;
+      }
+    },
   },
   created() {
     this.getRole();
     this.getLanguages();
+    this.getStudentQuestions();
   },
 };
 </script>
@@ -311,14 +338,23 @@ export default {
   flex-direction: column;
   flex-wrap: wrap;
   margin-bottom: 2rem;
+  padding: 2rem;
 }
 
-h3,
 #searchContainer h1 {
   text-align: left;
+  margin-bottom: 2rem;
 }
 
 @media only screen and (min-width: 600px) {
+  #searchContainer {
+    background-color: var(--ligthBlue);
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
 }
 @media only screen and (min-width: 1200px) {
   #searchContainer {

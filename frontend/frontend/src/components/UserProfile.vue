@@ -27,22 +27,17 @@
     <div class="content" v-if="isEdit">
       <span class="avatarContent">
         <img class="avatarProfile" :src="sharedStore.avatar" />
-        <input
-          id="editAvatar"
-          type="file"
-          ref="avatarLoad"
-          @change="getImageUpload"
-        />
+        <input id="editAvatar" type="file" ref="avatarLoad" @change="getImageUpload" />
         <p>{{ avatarLoad.name }}</p>
       </span>
 
       <span class="dataProfile">
-        <h3>USERANAME:</h3>
+        <h3>USERNAME:</h3>
         <input type="text" v-model="currentUser.username" />
         <h3>NOMBRE:</h3>
         <input type="text" v-model="currentUser.name" />
         <h3>APELLIDO:</h3>
-        <input type="text" v-model="currentUser.lastName" />
+        <input type="text" v-model="currentUser.lastname" />
         <h3>EMAIL:</h3>
         <input type="text" v-model="currentUser.email" />
         <h3>BIO:</h3>
@@ -67,7 +62,6 @@ export default {
   props: {
     currentUser: Object,
   },
-
   data() {
     return {
       avatarLoad: "",
@@ -81,14 +75,13 @@ export default {
       this.avatarLoad = this.$refs.avatarLoad.files[0];
       console.log("avatar", this.avatarLoad);
     },
-
     seeProfile() {
       this.isEdit = true;
     },
     updateProfile() {
       const userData = {
         name: this.currentUser.name,
-        lastname: this.currentUser.lastName,
+        lastname: this.currentUser.lastname,
         username: this.currentUser.username,
         email: this.currentUser.email,
         profile: this.currentUser.profile,
@@ -107,58 +100,94 @@ export default {
 <style scoped>
 #editAvatar {
   border: none;
-  /*  background-color: royalblue; */
   width: 50%;
+}
+.avatarContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .profileContainer {
-  text-align: left;
+  text-align: center;
 }
 .profileContainer h2 {
   margin-bottom: 2rem;
 }
 .content {
+  margin: 0 auto;
   display: flex;
-  flex-direction: row;
-  text-align: left;
-  align-items: space-evenly;
-  justify-content: stretch;
-  align-content: center;
+  flex-direction: column;
   flex-wrap: wrap;
-  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
-.avatarContent {
-  height: 30rem;
-  width: 15rem;
-  /* background-color: salmon; */
-}
+
 .dataProfile {
   display: flex;
   flex-direction: column;
-  align-items: space-around;
-  justify-content: stretch;
-  align-content: space-around;
-  padding-right: 2rem;
-  /* background-color: seagreen; */
-  width: 25rem;
+  align-items: center;
+  margin-top: 1rem;
+  max-width: 60vw;
 }
 .dataProfile p {
   margin-bottom: 2rem;
 }
 .buttons {
-  width: 15rem;
-  /*  background-color: skyblue; */
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-/* .currentProfile p,
-.currentProfile h3 {
-  margin-bottom: 1rem;
-} */
+
 .avatarProfile {
-  width: 154px;
-  height: 154px;
+  width: 100px;
+  height: 100px;
   border-radius: 80px;
+}
+
+@media only screen and (min-width: 900px) {
+  #editAvatar {
+    border: none;
+    width: 50%;
+  }
+
+  .profileContainer {
+    text-align: left;
+  }
+  .profileContainer h2 {
+    margin-bottom: 2rem;
+  }
+  .content {
+    display: flex;
+    flex-direction: row;
+    text-align: left;
+    align-items: flex-start;
+    justify-content: stretch;
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+  .avatarContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 18rem;
+  }
+  .dataProfile {
+    text-align: left;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 1rem;
+    width: 40%;
+    margin-top: 0;
+  }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
 }
 </style>

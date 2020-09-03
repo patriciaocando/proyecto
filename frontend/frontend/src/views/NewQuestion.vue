@@ -21,24 +21,17 @@
           v-for="language in languages"
           :key="language.id"
           :value="language.language"
-          >{{ language.language }}</option
-        >
+        >{{ language.language }}</option>
       </select>
 
       <p
         id="selectedLanguage"
         v-if="languageQuestion !== ''"
         :class="'languageStyle ' + languageQuestion.toLowerCase()"
-      >
-        {{ languageQuestion }}
-      </p>
+      >{{ languageQuestion }}</p>
       <h3>Escribe tu pregunta:</h3>
-      <textarea
-        name="textQuestion"
-        rows="4"
-        placeholder="Haz tu pregunta"
-        v-model="content"
-      ></textarea>
+
+      <textarea name="textQuestion" rows="4" placeholder="Haz tu pregunta" v-model="content"></textarea>
       <p v-show="showError">{{ errorMessage }}</p>
       <span class="buttonsContainer">
         <button @click="postQuestion()">Publicar</button>
@@ -50,16 +43,10 @@
 
 <script>
 import userData from "@/dataStorage/userData";
-import axios from "axios";
 import Swal from "sweetalert2";
 import api from "../api/api";
 
-import {
-  getAuthToken,
-  getIdToken,
-  ENDPOINT,
-  alertFunction,
-} from "../utils/helpers";
+import { alertFunction } from "../utils/helpers";
 
 export default {
   name: "NewQuestion",
@@ -90,8 +77,6 @@ export default {
         const response = await api.getLanguages();
         this.languages = response;
       } catch (error) {
-        this.showError = true;
-        /* this.errorMessage = error.response.data.message; */
         console.log(error);
       }
     },
@@ -105,13 +90,6 @@ export default {
         language: this.languageQuestion,
       };
 
-      //CONFIGURO EL OBJETO DE CONFIGURACION
-      let config = {
-        headers: {
-          Authorization: this.token,
-        },
-      };
-      //COMPRUEBO QUE LOS DATOS NO ESTEN VACIOS
       if (data.title === "" || data.content === "" || data.language === "") {
         alertFunction(
           "warning",
@@ -120,18 +98,13 @@ export default {
         );
       } else {
         try {
-          const response = await axios.post(
-            ENDPOINT + "/new-question",
-            data,
-            config
-          );
+          const response = await api.newQuestion(data);
           //ALERT DE CREACION DE PREGUNTA
           alertFunction(
             "success",
             "Pregunta publicada",
             "Se ha publicado tu pregunta exitosamente."
           );
-          console.log(response);
           this.$router.push({ name: "UserQuestions" });
         } catch (error) {
           this.showError = true;

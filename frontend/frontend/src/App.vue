@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <vue-headful title="TutorShip" description="TutorShip" />
     <component :is="layout" class="principal" @logout="logOut">
       <router-view @doLogin="getUserData" />
     </component>
@@ -18,7 +19,6 @@ export default {
   data() {
     return {
       userId: "",
-      userRole: "",
       token: "",
       sharedStore: userData.state,
     };
@@ -55,16 +55,17 @@ export default {
     async setData() {
       const user = await api.getUserProfile(this.userId);
 
+      console.log(user);
+
       this.sharedStore.id = this.userId;
       this.sharedStore.token = this.token;
-      this.sharedStore.username = user.data.data.username;
-      this.sharedStore.role = user.data.data.role;
-      this.sharedStore.avatar =
-        process.env.VUE_APP_STATIC + user.data.data.avatar;
-      this.sharedStore.email = user.data.data.email;
-      this.sharedStore.name = user.data.data.name;
-      this.sharedStore.lastName = user.data.data.lastName;
-      this.sharedStore.profile = user.data.data.profile;
+      this.sharedStore.username = user.username;
+      this.sharedStore.role = user.role;
+      this.sharedStore.avatar = process.env.VUE_APP_STATIC + user.avatar;
+      this.sharedStore.email = user.email;
+      this.sharedStore.name = user.name;
+      this.sharedStore.lastname = user.lastName;
+      this.sharedStore.profile = user.profile;
       this.sharedStore.isLogged = this.isAuthenticated;
 
       this.$router.push({ name: "Dashboard" });
@@ -77,7 +78,7 @@ export default {
       this.sharedStore.avatar = null;
       this.sharedStore.email = null;
       this.sharedStore.name = null;
-      this.sharedStore.lastName = null;
+      this.sharedStore.lastname = null;
       this.sharedStore.profile = null;
       this.sharedStore.isLogged = false;
       api.logout();
@@ -121,7 +122,7 @@ body {
   --semiBold: 600;
   --bold: 700;
   --extraBold: 800;
-  font-size: 12px;
+  font-size: 13px;
 }
 .principal {
   flex: 1 0 auto;
@@ -145,10 +146,9 @@ body {
 
 /*contenedor para vistas de dashboards */
 .container {
-  max-width: 65vw;
-  padding-top: 2rem;
-  padding-bottom: 4rem;
-  padding-left: 2rem;
+  width: 90%;
+  margin: 0 auto;
+  padding: 80px 2rem 4rem 2rem;
   text-align: left;
 }
 
@@ -157,7 +157,7 @@ body {
 }
 
 h1 {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   line-height: 2rem;
   letter-spacing: 0.03rem;
   color: var(--darkColor);
@@ -173,7 +173,7 @@ h2 {
 
 h3 {
   font-weight: var(--bold);
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.2rem;
   letter-spacing: 0.03rem;
   color: var(--darkColor);
@@ -204,8 +204,8 @@ h4 {
 }
 
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 24px;
   margin: 0.5rem;
   margin-right: 0.5rem;
@@ -222,10 +222,37 @@ h4 {
 }
 
 /* ///////////// BOTONES //////////////*/
+#registerButton {
+  /*texto*/
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06rem;
+  font-weight: var(--semiBold);
+  color: white;
+  /*fondo*/
+  border: none;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  background-color: var(--blue);
+  /*separacion*/
+  padding: 1rem 2rem;
+  margin-top: 2rem;
+}
 .deleteButton {
   background-image: url("./assets/icons/BORRAR.svg");
   background-repeat: no-repeat;
   background-position: 5% 50%;
+  background-size: 16px;
+  margin: 0;
+  padding-left: 2rem;
+  background-color: transparent;
+  color: var(--darkColor);
+}
+
+.deleteButton:hover {
+  background-image: url("./assets/icons/open-basket.svg");
+  background-repeat: no-repeat;
+  background-position: 3% 50%;
   background-size: 16px;
   margin: 0;
   padding-left: 2rem;
@@ -259,6 +286,7 @@ button {
   /*separacion*/
   padding: 1rem 1.5rem;
   margin: 1rem 0.5rem;
+  border: none;
 }
 button:focus {
   outline: none;
@@ -278,7 +306,7 @@ button:focus {
   background-color: var(--blue);
   /*separacion*/
   padding: 1rem 1.5rem;
-  margin: 1rem 0.5rem;
+  /* margin: 1rem 0.5rem; */
 }
 
 #button2 {
@@ -289,7 +317,7 @@ button:focus {
 #button3 {
   color: var(--darkColor);
   background-color: white;
-  margin: 0.5rem;
+  margin: 1rem 0.5rem 0.5rem 0.5rem;
   padding: 0.5rem;
 }
 
@@ -454,8 +482,25 @@ textarea:focus {
   .languageStyle {
     margin: 0 0.5rem;
   }
+  .container {
+    margin: 2rem auto;
+  }
 }
-@media only screen and (min-width: 1200px) {
+
+@media only screen and (min-width: 900px) {
+  .languageStyle {
+    margin: 0 0.5rem;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  /* .container {
+    width: 70%;
+    margin: 5rem 3rem 0 0;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    text-align: left;
+  } */
 }
 
 /* @media only screen and (max-width:600px)

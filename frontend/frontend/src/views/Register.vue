@@ -1,9 +1,6 @@
 <template>
   <div class="allContent">
-    <vue-headful
-      title="¡Regístrate! | TutorShip"
-      description="Registro en TutorShip"
-    />
+    <vue-headful title="¡Regístrate! | TutorShip" description="Registro en TutorShip" />
     <div class="backgroundImage">
       <!--DIV PARA COLOCAR LA IMAGEN DE TUTORSHIPS-->
     </div>
@@ -22,39 +19,22 @@
       <div class="registerInputs">
         <h2>Regístrate:</h2>
         <h3>EMAIL:</h3>
-        <input
-          type="email"
-          v-model="email"
-          placeholder="miemail@tutorships.com"
-        />
+        <input type="email" v-model="email" placeholder="miemail@tutorships.com" />
         <h3>NOMBRE DE USUARIO:</h3>
-        <input
-          @click="showText()"
-          type="text"
-          v-model="username"
-          placeholder="youngcoderpadawan"
-        />
-        <p class="accesibilityTxt" v-show="coment">
-          Puedes usar letras, númenos y signos de puntuación.
-        </p>
+        <input @click="showText()" type="text" v-model="username" placeholder="youngcoderpadawan" />
+        <p
+          class="accesibilityTxt"
+          v-show="coment"
+        >Puedes usar letras, númenos y signos de puntuación.</p>
 
         <h3>CONTRASEÑA:</h3>
-        <input
-          @click="showTextPass()"
-          type="password"
-          v-model="password"
-          placeholder="********"
-        />
+        <input @click="showTextPass()" type="password" v-model="password" placeholder="********" />
         <p class="accesibilityTxt" v-show="comentPass">
           Usa 8 o más caracteres con una combinación de letras, números y
           símbolos.
         </p>
         <h3>REPITE LA CONTRASEÑA:</h3>
-        <input
-          type="password"
-          v-model="confirmpassword"
-          placeholder="*******"
-        />
+        <input type="password" v-model="confirmpassword" placeholder="*******" />
 
         <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
         <div class="buttonsContent">
@@ -62,9 +42,7 @@
           <button class="cancelButton" @click="cancelAction()">Cancelar</button>
           <div class="loginContent">
             <p>¿Ya tienes cuenta?</p>
-            <button id="button3" @click="$router.push('/login')">
-              ¡Inicia sesión!
-            </button>
+            <button id="button3" @click="$router.push('/login')">¡Inicia sesión!</button>
           </div>
         </div>
       </div>
@@ -75,15 +53,17 @@
         <img src="../assets/logoTutorShips.png" alt="logo-tutorships" />
       </figure>
       <h1>¡Revisa tu email!</h1>
-      <button @click="$router.push('/login')">IR AL login</button>
+      <router-link class="button" :to="{ name: 'Home' }">IR AL HOME</router-link>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+/* import axios from "axios"; */
 import Swal from "sweetalert2";
-import { alertFunction, ENDPOINT, config } from "../utils/helpers";
+import api from "@/api/api";
+import { alertFunction } from "../utils/helpers";
+/* import { alertFunction, ENDPOINT, config } from "../utils/helpers"; */
 
 export default {
   name: "Register",
@@ -135,12 +115,8 @@ export default {
         this.coment = false;
 
         try {
-          const response = await axios.post(
-            ENDPOINT + "/new-user",
-            registerData
-          );
-
-          this.validationUrl = response.data.activationUrl;
+          const response = await api.newUser(registerData);
+          this.validationUrl = response.activationUrl;
 
           await alertFunction(
             "success",
@@ -151,9 +127,8 @@ export default {
           this.validationShow = true;
           this.registerShow = false;
         } catch (error) {
-          console.log(error);
           this.showError = true;
-          this.errorMessage = error.response.data.message;
+          this.errorMessage = error;
         }
       }
     },

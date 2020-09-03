@@ -14,6 +14,8 @@
 </template>
 
 <script>
+//STORAGE DE LOS DATOS DE USUARIO
+import userData from "@/dataStorage/userData";
 import axios from "axios";
 import Swal from "sweetalert2";
 import {
@@ -40,9 +42,16 @@ export default {
       showError: false,
       errorMessage: "",
 
-      //TOKEN
-      token: "",
+      sharedStore: userData.state,
     };
+  },
+  computed: {
+    token() {
+      return this.sharedStore.token;
+    },
+    route() {
+      return this.$route.name;
+    },
   },
   methods: {
     //TRAER RESPUESTAS HECHAS POR EL USUARIO DESDE LA BBDD
@@ -50,7 +59,7 @@ export default {
       try {
         const response = await axios.get(ENDPOINT + "/answer", {
           headers: {
-            Authorization: getAuthToken(),
+            Authorization: this.token,
           },
         });
         this.bbddAnswers = response.data.data;
@@ -71,7 +80,9 @@ export default {
           config
         );
 
-        location.reload();
+        alertFunction("success", "Editada!", "Tu respuesta ha sido editada.");
+        //location.reload();
+        await this.getAnswers();
       } catch (error) {
         this.showError = true;
         this.errorMessage = error.response.data.message;
@@ -93,9 +104,8 @@ export default {
       }
     },
   },
-  async created() {
-    this.token = getAuthToken();
-    await this.getAnswers();
+  created() {
+    this.getAnswers();
   },
 };
 </script>

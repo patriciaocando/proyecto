@@ -2,18 +2,11 @@
   <div class="container">
     <!--DATOS DE USUARIO-->
 
-    <userprofile
-      :currentUser="currentUser"
-      @iduserupdate="updateUserData"
-      :cancel="deleteError"
-    />
+    <userprofile :currentUser="currentUser" @iduserupdate="updateUserData" :cancel="deleteError" />
     <p v-show="showError">{{ errorMessage }}</p>
     <!--CAMBIO DE CONTRASEÑA-->
     <div>
-      <changepassword
-        :actualPassword="actualPassword"
-        v-on:changePassword="postNewPassword"
-      />
+      <changepassword :actualPassword="actualPassword" v-on:changePassword="postNewPassword" />
     </div>
   </div>
 </template>
@@ -41,7 +34,7 @@ export default {
     return {
       //variables de vista
       userLanguages: [],
-      userRole: "",
+
       actualPassword: "",
       //variables de gestion de errores
       showError: false,
@@ -49,7 +42,6 @@ export default {
 
       //DATA DE USUARIO
       sharedStore: userData.state,
-      /* currentUser: "", */
     };
   },
   computed: {
@@ -65,9 +57,6 @@ export default {
   },
 
   methods: {
-    /* getUserProfile() {
-      this.currentUser = cloneDeep(this.sharedStore);
-    }, */
     deleteError() {
       this.showError = false;
     },
@@ -84,13 +73,17 @@ export default {
       try {
         const response = await api.updateUserProfile(this.userId, formData);
 
-        this.sharedStore.username = userData.username;
+        const updatedUser = await api.getUserProfile(this.userId);
+
+        this.sharedStore.username = updatedUser.username;
         this.sharedStore.avatar =
-          process.env.VUE_APP_STATIC + userData.avatar.name;
-        this.sharedStore.email = userData.email;
-        this.sharedStore.name = userData.name;
-        this.sharedStore.lastName = userData.lastName;
-        this.sharedStore.profile = userData.profile;
+          process.env.VUE_APP_STATIC + updatedUser.avatar;
+        this.sharedStore.email = updatedUser.email;
+        this.sharedStore.name = updatedUser.name;
+        this.sharedStore.lastname = updatedUser.lastName;
+        this.sharedStore.profile = updatedUser.profile;
+
+        //traer el perfil de usurio desde la bbdd
 
         await alertFunction(
           "success",
@@ -120,7 +113,7 @@ export default {
         this.sharedStore.avatar = null;
         this.sharedStore.email = null;
         this.sharedStore.name = null;
-        this.sharedStore.lastName = null;
+        this.sharedStore.lastname = null;
         this.sharedStore.profile = null;
         this.sharedStore.isLogged = false;
         api.logout();

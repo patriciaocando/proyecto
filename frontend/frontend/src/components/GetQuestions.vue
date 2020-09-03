@@ -1,42 +1,28 @@
 <template>
   <div>
-    <div
-      class="questionAnswerContainer"
-      v-for="(question, index) in questions"
-      :key="question.id"
-    >
+    <div class="questionAnswerContainer" v-for="(question, index) in questions" :key="question.id">
       <question
         :question="question"
         :route="route"
         :isUser="isUser"
         @editquestion="editQuestionId"
+        @showmethsanswer="showmethsanswer"
+        :index="index"
+        @questionDeleted="questionDeleted"
+        @questionEdited="questionEdited"
       />
       <button
         v-if="!isUser"
         :class="{ hideButton: question.answers <= 0 }"
         @click="$router.push({ name: 'Register' })"
-      >
-        Regístrate para ver las respuestas
-      </button>
-
-      <span class="answerMeta" v-show="isUser">
-        <button
-          id="buttonAnswer"
-          :class="{ hideButton: question.answers <= 0 }"
-          @click="sendQuestionId(question.id, index)"
-        >
-          {{ buttonText }}
-        </button>
-      </span>
-
-      <!--MOSTRAR LAS RESPUESTAS-->
+      >Regístrate para ver las respuestas</button>
 
       <getanswer
         v-show="hideAnswer"
         class="answerContent"
         v-if="index === answer"
         :answers="answers"
-        @newVote="getRating"
+        @newVote="newVote"
       />
     </div>
   </div>
@@ -59,8 +45,6 @@ export default {
   },
   data() {
     return {
-      idQuestion: 2,
-
       seeAnswersButton: false,
       hideAnswer: false,
 
@@ -82,23 +66,21 @@ export default {
   },
 
   methods: {
-    getRating(data) {
-      this.$emit("rateAnswer", data);
+    questionEdited() {
+      this.$emit("questionEdited");
+    },
+    questionDeleted() {
+      this.$emit("questionDeleted");
+    },
+    newVote(data) {
+      this.$emit("newVote", data);
     },
     editQuestionId(id) {
       this.$emit("editquestion", id);
     },
-    closeAnswer() {},
-    sendQuestionId(id, index) {
-      /*  this.hideAnswer = !this.hideAnswer; */
+    showmethsanswer({ id, index }) {
       this.answer = index;
-      /*  if (this.hideAnswer === false) {
-        this.buttonText = "OCULTAR RESPUESTAS";
-      } else {
-        this.buttonText = "VER RESPUESTAS";
-      } */
       this.hideAnswer = !this.hideAnswer;
-
       this.$emit("showAnswers", id);
     },
   },

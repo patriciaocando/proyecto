@@ -14,9 +14,9 @@
           <img class="expertAvatar" :src="getImageName(expert.expert.avatar)" />
           <span>
             <h3>{{ expert.expert.username }}</h3>
-            <p class="accesibilityTxt">
-              Experto desde: {{ expert.expert.creation_date | getDistance }}
-            </p>
+            <p
+              class="accesibilityTxt"
+            >Experto desde: {{ expert.expert.creation_date | getDistance }}</p>
           </span>
         </div>
 
@@ -28,11 +28,7 @@
         <div>
           <h3>Lenguajes:</h3>
           <div class="languagesContainer">
-            <div
-              class="languageName"
-              v-for="language in expert.language"
-              :key="language.id"
-            >
+            <div class="languageName" v-for="language in expert.language" :key="language.id">
               <img class="languageImage" :src="getImageName(language.image)" />
               <p class="accesibilityTxt">{{ language.language }}</p>
             </div>
@@ -78,17 +74,20 @@ export default {
 
 <style scoped>
 .title {
-  margin-bottom: 2rem;
+  margin: 3rem;
 }
 h3 {
   margin-bottom: 0;
 }
+ul.allExpContainer {
+  margin-bottom: 2rem;
+}
+
 .allExpContainer {
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 1rem;
   padding: 0;
 }
 .expertContainer {
@@ -144,9 +143,11 @@ h3 {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-around;
     margin: 1rem;
+    max-width: 90vw;
+    margin: 0 auto;
   }
   .container {
     list-style: none;
@@ -154,12 +155,12 @@ h3 {
     flex-direction: row;
   }
   .expertContainer {
-    width: 40%;
-    height: 300px;
+    width: 45%;
+    flex-grow: 0;
   }
   .languageImage {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 0.25rem;
     margin-right: 1rem;
   }
@@ -186,11 +187,22 @@ h3 {
 
 @media only screen and (min-width: 900px) {
   .allExpContainer {
-    max-width: 70vw;
+    max-width: 90vw;
     margin: 0 auto;
   }
   .expertContainer {
-    height: 30%;
+    width: 42%;
+    padding: 1.5rem;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .allExpContainer {
+    max-width: 90vw;
+    margin: 5rem auto;
+  }
+  .expertContainer {
+    width: 28%;
     padding: 1.5rem;
   }
 }

@@ -1,9 +1,6 @@
 <template>
   <div class="allContent">
-    <vue-headful
-      title="Experto | TutorShip"
-      description="Solicitar volverse experto"
-    />
+    <vue-headful title="Experto | TutorShip" description="Solicitar volverse experto" />
     <div class="backgroundImage">
       <!--DIV PARA COLOCAR LA IMAGEN DE TUTORSHIPS-->
     </div>
@@ -27,14 +24,13 @@
         <languagesselector
           :languages="bbddLanguages"
           @languageId="getComponentLanguage"
+          @disableErrorMsg="disableErrorMsg"
         />
         <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
 
         <div class="buttonsContent">
           <button @click="postExpertRequest()">ENVIAR MI SOLICITUD</button>
-          <button class="cancelButton" @click="cancelRequest()">
-            Cancelar
-          </button>
+          <button class="cancelButton" @click="cancelRequest()">Cancelar</button>
         </div>
       </div>
     </div>
@@ -72,7 +68,9 @@ export default {
         this.errorMessage = error;
       }
     },
-
+    disableErrorMsg() {
+      this.showError = false;
+    },
     //TRAER EL LENGUAJE ESCOGIDO DEL COMPONENTE/SELECT LENGUAJES
     getComponentLanguage(languageId) {
       this.choosenLanguages = languageId;
@@ -80,19 +78,24 @@ export default {
     },
     //ENVIAR LA LSOLICTUD AL ADMIN
     async postExpertRequest() {
-      try {
-        await api.expertRequest(this.choosenLanguages);
-
-        alertFunction(
-          "success",
-          "Solicitud enviada",
-          "EL administrador de Tutorships te responderá proximamente"
-        );
-
-        this.$router.push({ name: "Dashboard" });
-      } catch (error) {
+      if (this.choosenLanguages.length === 0) {
         this.showError = true;
-        this.errorMessage = error;
+        this.errorMessage = "Debes seleccionar al menos un lenguaje";
+      } else {
+        try {
+          await api.expertRequest(this.choosenLanguages);
+
+          alertFunction(
+            "success",
+            "Solicitud enviada",
+            "EL administrador de Tutorships te responderá proximamente"
+          );
+
+          this.$router.push({ name: "Dashboard" });
+        } catch (error) {
+          this.showError = true;
+          this.errorMessage = error;
+        }
       }
     },
 

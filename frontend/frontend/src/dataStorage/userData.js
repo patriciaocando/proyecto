@@ -10,7 +10,7 @@ const userStorage = {
     avatar: null,
     email: null,
     name: null,
-    lastName: null,
+    lastname: null,
     profile: null,
     isLogged: null,
   },

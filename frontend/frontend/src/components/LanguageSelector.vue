@@ -10,8 +10,7 @@
         :key="language.id"
         :value="language.id"
         :disabled="isDisable(language.id)"
-        >{{ language.language }}</option
-      >
+      >{{ language.language }}</option>
     </select>
 
     <div class="tagsContainer" v-show="seeLanguages">
@@ -21,9 +20,7 @@
         :key="languageChosen.id"
         :class="'languageStyle ' + languageChosen.name.toLowerCase()"
         @click="deleteTagLanguage(languageChosen.id)"
-      >
-        {{ languageChosen.name }} x
-      </button>
+      >{{ languageChosen.name }} x</button>
     </div>
   </div>
 </template>
@@ -63,7 +60,7 @@ export default {
     onChange(event) {
       this.seeLanguages = true;
       let id = Number(event.target.value);
-
+      this.$emit("disableErrorMsg");
       //BUSCO EL NOMBRE DEL LENGUAJE PARA MOSTRARLO
       for (const language of this.languages) {
         if (language.id === id) {
@@ -77,7 +74,6 @@ export default {
       this.isDisable();
 
       this.selectedUserLanguages.push(id);
-
       this.$emit("languageId", this.selectedUserLanguages);
     },
   },

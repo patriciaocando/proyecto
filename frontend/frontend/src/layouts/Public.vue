@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="publicLayout">
     <MenuCustom @logout="logOut" />
     <main class="main">
       <slot />
@@ -23,4 +23,5 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+</style>

@@ -70,6 +70,15 @@ async function newUser(req, res, next) {
     //avatar por defecto
     const defaultAvatar = "defaultAvatar.png";
 
+    /*   try {
+     let userAvatar = await processImage(req.files.avatar);
+    } catch (error) {
+      throw errorGenerator(
+        `No hemos podido procesar la imagen, por favor intentalo de nuevo`,
+        400
+      );
+    }
+ */
     //meter en nuevo usuario en la base de datos sin activar
     await connection.query(
       `

@@ -15,18 +15,13 @@
       <!--SELECCION DE LENGUAJE-->
       <div class="firstLineFilter">
         <label for="aviableLanguages">Lenguajes:</label>
-        <select
-          id="aviableLanguages"
-          name="aviableLanguages"
-          v-model="language"
-        >
+        <select id="aviableLanguages" name="aviableLanguages" v-model="language">
           <!-- <option>Selecciona un lenguaje:</option> -->
           <option
             v-for="language in languages"
             :key="language.id"
             :value="language.language"
-            >{{ language.language }}</option
-          >
+          >{{ language.language }}</option>
         </select>
 
         <!--AUTOR-->
@@ -66,24 +61,18 @@
     <!--MENSAJE DE ERROR-->
     <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
     <!--BOTON LIMPIAR FILTROS-->
-    <button v-show="filter" id="button3" @click="ereaseFilters()">
-      LIMPIAR FILTROS
-    </button>
+    <button v-show="filter" id="button3" @click="ereaseFilters()">LIMPIAR FILTROS</button>
 
     <!--BOTONES DE BUSQUEDA-->
     <div class="searchButtons">
-      <button class="cancelButton" @click="newSearch()">
-        BORRAR BÚSQUEDA
-      </button>
+      <button class="cancelButton" @click="newSearch()">BORRAR BÚSQUEDA</button>
       <button @click="sendSearchParams()">BUSCAR</button>
       <button id="button2" @click="showFilter()">FILTROS</button>
     </div>
 
     <span class="errorContainer" v-show="newSearchView">
       <p>{{ response }}</p>
-      <button id="button2" @click="newSearch()">
-        REALIZAR NUEVA BÚSQUEDA
-      </button>
+      <button id="button2" @click="newSearch()">REALIZAR NUEVA BÚSQUEDA</button>
     </span>
   </div>
 </template>
@@ -113,7 +102,7 @@ export default {
   },
   computed: {
     response() {
-      return this.newSearchData.response;
+      return this.newSearchData.error;
     },
     newSearchView() {
       return this.newSearchData.newSearchView;
@@ -326,7 +315,7 @@ export default {
   }
 
   #Search {
-    background-position: 2% 50%;
+    background-position: 1% 50%;
   }
 
   #button3 {

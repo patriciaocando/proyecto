@@ -16,33 +16,19 @@
       <div class="loginInputs">
         <h2>Ingresa a tu cuenta:</h2>
         <h3>EMAIL:</h3>
-        <input
-          type="text"
-          v-model="email"
-          placeholder="miemail@tutorships.com"
-          required
-        />
+        <input type="text" v-model="email" placeholder="miemail@tutorships.com" required />
         <h3>PASSWORD:</h3>
-        <input
-          type="password"
-          v-model="password"
-          placeholder="Password"
-          required
-        />
+        <input type="password" v-model="password" placeholder="Password" required />
 
         <p class="errorTxt" v-show="showError">{{ errorMessage }}</p>
       </div>
       <div class="buttonsContent">
         <button id="logingButton" @click="login()">INICIAR SESIÓN</button>
         <button class="cancelButton" @click="cancelLogin()">CANCELAR</button>
-        <router-link class="simpleLink" :to="{ name: 'RecoverPassword' }"
-          >¿Olvidaste tu contraseña?</router-link
-        >
+        <router-link class="simpleLink" :to="{ name: 'RecoverPassword' }">¿Olvidaste tu contraseña?</router-link>
         <div class="registerContent">
           <p>¿No tienes cuenta?</p>
-          <button id="button3" @click="$router.push('/registrate')">
-            ¡Regístrate!
-          </button>
+          <button id="button3" @click="$router.push('/registrate')">¡Regístrate!</button>
         </div>
       </div>
     </div>
@@ -58,9 +44,10 @@ export default {
     return {
       email: "patypocando@gmail.com",
       password: "12345678",
+      /* 
+      email: "tutorshipStudent@gmail.com",
+      password: "12345678", */
 
-      /* email: "seijas_luis@hotmail.com",
-      password: "741852963",*/
       showError: false,
       errorMessage: "",
     };
@@ -74,32 +61,15 @@ export default {
         api
           .login(this.email, this.password)
           .then((data) => {
-            console.log("3");
             console.log("recibo y envio token");
             this.$emit("doLogin", data);
           })
           .catch((error) => {
-            console.error(error);
+            this.showError = true;
+            this.errorMessage = error;
           });
       }
     },
-    /* async login() {
-      this.showError = false;
-      if (this.email === "" || this.password === "") {
-        this.showError = true;
-        this.errorMessage = "Debes llenar todos los campos";
-      } else {
-        try {
-          let token = await api.login(this.email, this.password);
-          console.log("todo ok, lanzo evento");
-          this.$emit("doLogin", token);
-        } catch (error) {
-          console.log(error);
-          this.showError = true;
-          this.errorMessage = error;
-        }
-      }
-    }, */
     cancelLogin() {
       this.email = "";
       this.password = "";

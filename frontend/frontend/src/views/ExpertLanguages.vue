@@ -38,6 +38,8 @@
 <script>
 //STORAGE DE LOS DATOS DE USUARIO
 import userData from "@/dataStorage/userData";
+import api from "@/api/api";
+
 import axios from "axios";
 import Swal from "sweetalert2";
 import {
@@ -123,7 +125,8 @@ export default {
             },
           }
         );
-        location.reload();
+        await this.getUserLanguages();
+        await this.getLanguages();
       } catch (error) {
         this.showError = true;
         this.errorMessage = error.response.data.message;
@@ -131,8 +134,8 @@ export default {
     },
     //ASOCIAR UN NUEVO LENGUAJE
     async addLanguage(languageId) {
-      console.log(languageId);
       try {
+        //await api.newLanguageExpert(languageId);
         let data = {
           newlanguage: languageId,
         };
@@ -141,10 +144,11 @@ export default {
           data,
           config
         );
-        location.reload();
+        await this.getUserLanguages();
+        await this.getLanguages();
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
   },
