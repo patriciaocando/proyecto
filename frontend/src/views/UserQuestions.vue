@@ -1,5 +1,9 @@
 <template>
   <div class="container">
+    <vue-headful
+      title="Preguntas | TutorShip"
+      description="Página de las rpreguntas que ha realizado un usuario"
+    />
     <span id="sectionTitle">
       <h1>Tus preguntas</h1>
       <h2>Aquí puedes ver las preguntas que has realizado</h2>
@@ -9,9 +13,9 @@
       id="questionsBody"
       :questions="questions"
       :answers="answers"
+      :route="route"
       @showAnswers="getAnswersById"
-      @rateAnswer="rateAnswer"
-      @editquestion="getQuestionData"
+      @editquestion="questionEdited"
       @questionDeleted="questionDeleted"
       @questionEdited="questionEdited"
     />
@@ -27,18 +31,10 @@
 <script>
 //STORAGE DE LOS DATOS DE USUARIO
 import userData from "@/dataStorage/userData";
-import axios from "axios";
 import api from "@/api/api.js";
 
 import getquestions from "@/components/GetQuestions.vue";
-
-import {
-  getAuthToken,
-  getIdToken,
-  alertFunction,
-  config,
-  ENDPOINT,
-} from "../utils/helpers";
+import { alertFunction } from "../utils/helpers";
 
 export default {
   name: "UserQuestions",
@@ -85,53 +81,22 @@ export default {
     //TRAER LAS RESPUESTA DE LA PREGUNTA SELECCIONADA SI ES USUARIO LOGUEADO
     async getAnswersById(idQuestion) {
       try {
-        const response = await api.getAnswers(idQuestion);
+        const response = await api.getSingleAnswer(idQuestion);
         this.answers = response;
       } catch (error) {
         this.showError = true;
         this.errorMessage = error;
       }
     },
-    //VOTAR UNA RESPUESTA
-    async rateAnswer(data) {
-      try {
-        const response = await api.postRating(data);
-
-        alertFunction(
-          "success",
-          "Ranking",
-          `¡Has Votado con ${data.rating} puntos!`
-        );
-      } catch (error) {
-        await alertFunction("error", "Opss!", `Ya has votado esta respuesta`);
-      }
-    },
-
-    async getQuestionData(id) {
-      this.hideQuestion = true;
-
-      try {
-        const response = await axios.get(ENDPOINT + "/question/" + id, {
-          headers: {
-            Authorization: this.token,
-          },
-        });
-
-        this.title = response.data.data.title;
-        this.content = response.data.data.question_text;
-        this.idQuestion = id;
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    questionEdited() {
+    async questionEdited() {
       //ALERT DE EDITAR
       alertFunction(
         "success",
         "Actualizado",
         `Has editado tu pregunta exitosamente`
       );
-      this.getQuestionsAnwer();
+      this.endEdition = true;
+      await this.getQuestionsAnwer();
     },
     questionDeleted() {
       alertFunction("success", "Borrada!", "Tu pregunta ha sido borrada.");

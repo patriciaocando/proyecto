@@ -1,71 +1,36 @@
 <template>
   <!--ELEMENTOS COMUNES-->
   <div class="container">
+    <vue-headful title="Dashboard" description="Dashboard experto" />
     <!--COMPONENTE DE BUSQUEDA-->
-    <div id="searchContainer" v-show="searchBar">
-      <h3>BIENVENIDO</h3>
+    <div id="searchContainer" v-if="searchBar">
+      <h3>BIENVENIDO!!</h3>
       <h1>Encuentra todas las respuestas que necesitas</h1>
       <searchcomponent
-        @queryParams="collectParams"
-        :languages="languages"
         :newSearchData="newSearchData"
+        @queryParams="getQuestions"
         @newSearch="newSearch"
       />
     </div>
-    <!--GESTION DE ERRORES-->
-    <p v-show="showError">{{ errorMessage }}</p>
-    <!--MOSTRAR LOS RESULTADOS DE LA BUSQUEDA-->
+    <h3 v-if="searchBar">{{ mesage }}</h3>
+    <getquestions
+      v-if="searchBar"
+      :questions="questions"
+      @getQuestionToAnswer="getQuestionToAnswer"
+    />
 
-    <!-- <div class="emptyState" v-show="noQuestions">
-      <p>Aww... aun no has preguntado nada aún</p>
+    <div class="emptyState" v-show="emptyState">
       <h2>¡Haz tu primera pregunta!</h2>
-      <router-link class="button" :to="{ name: 'NewQuestion' }"
-        >Hacer pregunta</router-link
-      >
-    </div>-->
-
-    <div v-show="showResultSearch">
-      <h3>RESULTADOS DE TU BÚSQUEDA:</h3>
-      <getquestions
-        :questions="questionsResultSearch"
-        :answers="answers"
-        @showAnswers="getAnswersById"
-      />
+      <router-link class="button" :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
     </div>
 
-    <div v-show="!showResultSearch" class="mainView">
-      <h3 v-show="allQuestions">{{ mesage }}</h3>
-
-      <!--VISTA EXPERTO-->
-      <showquestionstoexpert
-        v-if="role === 'experto'"
-        v-show="allQuestions"
-        :questions="questionsToExpert"
-      />
-      <!--  @getQuestion="getQuestion" -->
-      <answerquestion
-        v-show="!allQuestions"
-        :question="question"
-        @publishAnswer="publishAnswer"
-        @cancelEdition="cancelEditAnswer"
-      />
-
-      <!--VISTA ESTUDIANTE-->
-
-      <div>
-        <getquestions
-          v-if="role === 'estudiante'"
-          :questions="studentQuestions"
-          :answers="answers"
-          @showAnswers="getAnswersById"
-          @newVote="newVote"
-        />
-        <div class="emptyState" v-show="noQuestions">
-          <h2>¡Haz tu primera pregunta!</h2>
-          <router-link class="button" :to="{ name: 'NewQuestion' }">Hacer pregunta</router-link>
-        </div>
-      </div>
-    </div>
+    <!-- COMPONENTE PARA RESPONDER UNA PREGUNTA -->
+    <answerquestion
+      v-show="!searchBar"
+      v-if="activar"
+      :question="questionToAnswer"
+      @cancelEdition="cancelEditAnswer"
+    />
   </div>
 </template>
 
@@ -75,21 +40,9 @@ import searchcomponent from "@/components/SearchComponent.vue";
 import getquestions from "@/components/GetQuestions.vue";
 //COMPONENTES PARA EXPERTO
 import answerquestion from "@/components/AnswerQuestion.vue";
-import showquestionstoexpert from "@/components/GetQuestionsToExpert.vue";
-
-///////////
-import userquestions from "@/views/UserQuestions.vue";
 
 //IMPORTAR UTILIDADES
-import axios from "axios";
-import {
-  getAuthToken,
-  getRoleToken,
-  getIdToken,
-  alertFunction,
-  config,
-  ENDPOINT,
-} from "../utils/helpers";
+import { alertFunction } from "../utils/helpers";
 
 //STORAGE DE LOS DATOS DE USUARIO
 import userData from "@/dataStorage/userData";
@@ -100,10 +53,7 @@ export default {
   components: {
     getquestions,
     searchcomponent,
-    showquestionstoexpert,
     answerquestion,
-    /////////////
-    userquestions,
   },
   data() {
     return {
@@ -112,40 +62,18 @@ export default {
       //mensaje de actividad reciente
       mesage: "",
 
-      //ocultar barra de busqueda
+      //oculta la barra de busqueda si se va a responder alguna pregunta
       searchBar: true,
-
       newSearchData: {},
-      searchMessage: false,
+      searchMessage: "",
 
-      //Variable para interpolar los lenguajes en la busqueda
-      languages: [],
+      questions: [],
+      questionToAnswer: {},
+      activar: false,
 
-      answers: [],
-
-      //Variable estudiante
-      studentQuestions: [],
-      studentAnswers: [],
-      showQuestion: true,
-      noQuestions: false,
-      count: "",
-
-      //CONTENIDO PARA EDITAR PREGUNTA
-      newTitle: "",
-      newContent: "",
-      question: [],
-      questionsToExpert: [],
-      allQuestions: true,
-
-      //Variables resultado de la busqueda
-      showResultSearch: false,
-      questionsResultSearch: [],
-
-      //variables de gestion de errores
-      showError: false,
-      errorMessage: "",
-      /* //TOKEN
-      token: "", */
+      emptyState: "",
+      //mostrar el componente de responder
+      isAnswer: false,
     };
   },
   computed: {
@@ -161,159 +89,90 @@ export default {
   },
 
   methods: {
-    cancelEditAnswer() {
-      this.allQuestions = true;
-      this.searchBar = true;
-    },
+    //*BUSQUEDA: DATA PARA EL BOTON DE NUEVA BUSQUEDA
     newSearch() {
-      this.isResult = false;
       this.searchMessage = false;
       this.showResultSearch = false;
-      this.getRole();
+      // this.getRole();
     },
-    //////////////////////////////////////////////////////
-    //ENPOINTS GENERALES
-    //OBTENGO EL ROL PARA SABER QUE LE VA A MOSTRAR AL USUARIO SEGUN SU ROL
-    getRole() {
-      if (this.role === "estudiante") {
-        this.mesage = "ACTIVIDAD RECIENTE";
-        this.getStudentQuestions();
-      } else if (this.role === "experto") {
-        this.mesage = "PREGUNTAS PARA RESPONDER";
-        this.getQuestionsToAnswer();
-      } else {
-        console.log("carga funcion de admin");
-      }
-    },
-    newVote(data) {
-      alertFunction(
-        "success",
-        "Ranking",
-        `¡Has Votado con ${data.rating} puntos!`
-      );
-      /* this.getAnswersById(data.id);
-      console.log("me ejecuto"); */
-    },
-    //RECIBO LOS PARAMETROS DE BUSQUEDA DESDE MI COMPONENTE
-    collectParams(componentParams) {
-      this.showQuestion = false;
-      this.getQuestions(componentParams);
-    },
+    //*BUSQUEDA: RECIBO LOS PARAMETROS DE BUSQUEDA DESDE MI COMPONENTE
     async getQuestions(componentParams) {
       try {
-        let response = await api.getQuestions(componentParams);
+        this.questions = await api.getQuestions(componentParams);
 
         this.searchMessage = false;
-        this.showResultSearch = true;
-        this.questionsResultSearch = response;
-
-        await this.getLanguages();
+        this.mesage = "RESULTADOS DE TU BÚSQUEDA";
       } catch (error) {
-        this.newSearchData = {
-          response: "No hay resultados que coincidan con tu búsqueda",
-          newSearchView: true,
-        };
-        this.isResult = false;
+        if (error === "No hay resultados que coincidan con tu búsqueda") {
+          this.newSearchData = {
+            error,
+            newSearchView: true,
+          };
+          this.showResultSearch = false;
+          this.mesage = "";
+        }
+        console.error(error);
       }
     },
-    //TRAER LOS LENGUAJES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
-    async getLanguages() {
-      try {
-        this.languages = await api.getLanguages();
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
+    async getRole() {
+      console.log(this.role);
+      if (this.role === "estudiante") {
+        this.mesage = "ACTIVIDAD RECIENTE:";
+        await this.getStudentQuestions();
+      } else if (this.role === "experto") {
+        this.mesage = "PREGUNTAS PARA RESPONDER:";
+        this.getQuestionsForExpert();
+      } else {
+        //console.log("carga funcion de admin");
       }
     },
-    //////////////////////////////////////////////////////
-    //ENPOINTS PARA ESTUDIANTE
-
-    //LAS PREGUNTAS QUE HA HECHO EL ESTUDIANTE RECIENTEMENTE
+    //*ESTUDIANTE: LAS PREGUNTAS QUE HA HECHO EL ESTUDIANTE RECIENTEMENTE
     async getStudentQuestions() {
       try {
-        const response = await api.userQuestions();
-        this.studentQuestions = response;
+        this.questions = await api.userQuestions();
 
-        if (this.studentQuestions.length === 0) {
-          this.noQuestions = true;
+        if (this.questions.length === 0) {
+          this.emptyState = true;
         }
       } catch (error) {
         this.showError = true;
         this.errorMessage = error;
       }
     },
-    //TRAER LAS RESPUESTA DE LA PREGUNTA SELECCIONADA SI ES USUARIO LOGUEADO
-    async getAnswersById(idQuestion) {
+    //*EXPERTO: TRAIGO LAS PREGUNTAS QUE PUEDE RESPONDER EL EXPERTO
+    async getQuestionsForExpert() {
       try {
-        this.answers = await api.getAnswers(idQuestion);
+        this.questions = await api.questionsForExpert();
       } catch (error) {
         this.showError = true;
         this.errorMessage = error;
       }
     },
-    //////////////////////////////////////////////////////
-    //ENPOINTS PARA EXPERTO
-    //TRAIGO LAS PREGUNTAS QUE PUEDE RESPONDER EL EXPERTO
-    async getQuestionsToAnswer() {
+    //*EXPERTO: ID DE LA PREGUNTA QUE SE QUIERE RESPONDER
+    async getQuestionToAnswer(idQuestion) {
+      console.log("desde Dash", idQuestion);
+
       try {
-        const response = await api.questionsToAnswer();
-        this.questionsToExpert = response;
+        this.searchBar = false;
+        const response = await api.questionToAnswer(idQuestion);
+        if (response !== {}) {
+          this.activar = true;
+          this.questionToAnswer = response;
+          console.log(this.questionToAnswer);
+        }
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
+        console.error(error);
       }
     },
-    /*   async getQuestion(id) {
-      this.searchBar = false;
-      try {
-        const response = await axios.get(ENDPOINT + "/question/" + id, {
-          headers: {
-            Authorization: this.token,
-          },
-        });
-        this.question.push(response.data.data);
-        this.allQuestions = false;
-        this.idQuestion = id;
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
-      }
-    }, */
-    async publishAnswer(data) {
-      try {
-        const response = await axios.post(
-          ENDPOINT + "/new-answer/" + this.idQuestion,
-          data,
-          {
-            headers: {
-              Authorization: this.token,
-            },
-          }
-        );
-        alertFunction(
-          "success",
-          "HAS RESPONDIDO",
-          "Tu respuesta se ha publicado correctamente"
-        );
-        this.$router.push({ name: "UserQuestions" });
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
-      }
-    },
-    async getAnswersById(idQuestion) {
-      try {
-        this.answers = await api.getAnswers(idQuestion);
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
-      }
+    cancelEditAnswer() {
+      this.searchBar = true;
+      this.getRole();
     },
   },
   created() {
     this.getRole();
-    this.getLanguages();
-    this.getStudentQuestions();
+    //this.getStudentQuestions();
+    //this.getQuestionsForExpert();
   },
 };
 </script>

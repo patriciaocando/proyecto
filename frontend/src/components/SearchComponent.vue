@@ -1,16 +1,18 @@
 <template>
   <div class="searchContent">
-    <input
-      @newSearch="ereaseFilters()"
-      id="Search"
-      name="Search"
-      type="search"
-      v-model="search"
-      autocomplete="off"
-      placeholder="Busca por palabras clave, autor, lenguaje, nombre de usuario"
-      @click="showError = false"
-    />
-
+    <span class="searchBar">
+      <input
+        @newSearch="ereaseFilters()"
+        id="Search"
+        name="Search"
+        type="search"
+        v-model="search"
+        autocomplete="off"
+        placeholder="Busca por palabras clave, autor, lenguaje, nombre de usuario"
+        @click="showError = false"
+      />
+      <button @click="sendSearchParams()">BUSCAR</button>
+    </span>
     <div class="filterContent" v-show="filter">
       <!--SELECCION DE LENGUAJE-->
       <div class="firstLineFilter">
@@ -66,7 +68,7 @@
     <!--BOTONES DE BUSQUEDA-->
     <div class="searchButtons">
       <button class="cancelButton" @click="newSearch()">BORRAR BÚSQUEDA</button>
-      <button @click="sendSearchParams()">BUSCAR</button>
+      <!--  <button @click="sendSearchParams()">BUSCAR</button> -->
       <button id="button2" @click="showFilter()">FILTROS</button>
     </div>
 
@@ -78,11 +80,11 @@
 </template>
 
 <script>
+import api from "@/api/api.js";
 export default {
   name: "SearchComponent",
   props: {
     questions: Array,
-    languages: Array,
     newSearchData: Object,
   },
   data() {
@@ -98,6 +100,7 @@ export default {
       showError: false,
       errorMessage: "",
       filter: false,
+      languages: [],
     };
   },
   computed: {
@@ -153,6 +156,17 @@ export default {
       this.status = "";
       this.filter = true;
     },
+    async getLanguages() {
+      try {
+        this.languages = await api.getLanguages();
+      } catch (error) {
+        this.showError = true;
+        this.errorMessage = error;
+      }
+    },
+  },
+  created() {
+    this.getLanguages();
   },
 };
 </script>
@@ -197,11 +211,18 @@ export default {
   margin: 0;
 }
 
-/* #Search:hover,
-#Search:focus {
-  border: 1px solid #009688;
-  background-color: white;
-} */
+.searchBar {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: stretch;
+  width: 100%;
+}
+
+.searchBar button {
+  margin: 1rem 0;
+}
 
 .filterContent {
   display: flex;
@@ -294,14 +315,25 @@ export default {
   }
 } */
 @media only screen and (min-width: 600px) {
-  /* .searchContent {
-    width: 90vw;
-  } */
+  .searchBar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .searchBar button {
+    margin: 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .searchBar input {
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
 }
 @media only screen and (min-width: 900px) {
-  /* .searchContent {
-    width: 75vw;
-  } */
   .filterContent {
     width: 100%;
     display: flex;

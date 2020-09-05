@@ -1,5 +1,9 @@
 <template>
   <div class="container">
+    <vue-headful
+      title="Nueva pregunta  |  Tutorship"
+      description="Publicar una nueva pregunta en la plataforma"
+    />
     <span id="sectionTitle">
       <h1>Nueva pregunta</h1>
       <h2>Escoge el lenguaje de programacion y escribe tu pregunta</h2>

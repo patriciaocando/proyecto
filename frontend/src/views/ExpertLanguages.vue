@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <vue-headful title="Lenguajes | Tutorship" description="Lenguajes de experto" />
     <!--LENGUAGES DE EXPERTO-->
     <h1>Lenguajes asociados:</h1>
     <div class="languageContainer" v-for="language in userLanguages" :key="language.id">
@@ -27,7 +28,7 @@
             <p>{{ languages.description }}</p>
           </span>
           <span class="buttonContainer">
-            <button @click="addLanguage(languages.id)">ASOCIAR A LENGUAJE</button>
+            <button @click="addLanguage(languages.id,languages.language)">ASOCIAR A LENGUAJE</button>
           </span>
         </div>
       </div>
@@ -40,16 +41,7 @@
 import userData from "@/dataStorage/userData";
 import api from "@/api/api";
 
-import axios from "axios";
-import Swal from "sweetalert2";
-import {
-  getAuthToken,
-  getIdToken,
-  alertFunction,
-  getRoleToken,
-  config,
-  ENDPOINT,
-} from "../utils/helpers";
+import { alertFunction } from "../utils/helpers";
 export default {
   name: "ExpertLanguages",
 
@@ -82,13 +74,8 @@ export default {
     async getUserLanguages() {
       if (this.userRole === "experto") {
         try {
-          const response = await axios.get(ENDPOINT + "/expert/languages", {
-            headers: {
-              Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-            },
-          });
-
-          this.userLanguages = response.data.data;
+          const response = await api.getUserLanguages();
+          this.userLanguages = response;
         } catch (error) {
           this.showError = true;
           this.errorMessage = error.response.data.message;
@@ -99,8 +86,9 @@ export default {
     async getLanguages() {
       try {
         await this.getUserLanguages();
-        const response = await axios.get(ENDPOINT + "/languages");
-        this.bbddLanguages = response.data.data;
+
+        const response = await api.getLanguages();
+        this.bbddLanguages = response;
 
         for (const language of this.userLanguages) {
           for (const [index, bbddlanguageAux] of this.bbddLanguages.entries()) {
@@ -110,45 +98,44 @@ export default {
           }
         }
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
+        console.error(error);
       }
     },
     //BORRAR LENGUAJE DE UN EXPERTO
-    async deleteUserLanguage(languageId) {
+    async deleteUserLanguage(idLanguage) {
       try {
-        const response = await axios.delete(
-          ENDPOINT + "/users/delete-language/" + languageId,
-          {
-            headers: {
-              Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-            },
-          }
-        );
-        await this.getUserLanguages();
-        await this.getLanguages();
+        if (this.userLanguages.length <= 1) {
+          alertFunction(
+            "warning",
+            "Upss!",
+            "Debes tener por lo menos un lenguaje asociado"
+          );
+        } else {
+          const response = await api.deleteLanguageExpert(idLanguage);
+
+          await this.getUserLanguages();
+          await this.getLanguages();
+        }
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
+        console.error(error);
       }
     },
     //ASOCIAR UN NUEVO LENGUAJE
-    async addLanguage(languageId) {
+    async addLanguage(languageId, languageName) {
       try {
-        //await api.newLanguageExpert(languageId);
         let data = {
           newlanguage: languageId,
         };
-        const response = await axios.put(
-          ENDPOINT + "/users/add-language",
-          data,
-          config
+        const response = await api.newLanguageExpert(data);
+        await alertFunction(
+          "success",
+          "Nuevo lenguaje",
+          `Has asociado tu perfil al lenguaje: ${languageName}.`
         );
         await this.getUserLanguages();
         await this.getLanguages();
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
+        console.error(error);
       }
     },
   },

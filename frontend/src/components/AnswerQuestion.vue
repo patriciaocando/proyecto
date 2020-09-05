@@ -1,6 +1,7 @@
 <template>
   <div class="questionConteiner">
-    <getquestions :questions="question" />
+    <question :question="question"/>
+
     <div id="answerInput">
       <h3>Escribe tu respuesta:</h3>
       <textarea
@@ -23,21 +24,23 @@
 </template>
     
 <script>
-import getquestions from "@/components/GetQuestions.vue";
+import question from "@/components/Question.vue";
+import { alertFunction } from "../utils/helpers";
+import api from "@/api/api.js";
 
 export default {
   name: "answerQuestion",
   props: {
-    question: Array,
+    question: Object
   },
   components: {
-    getquestions,
+    question
   },
   data() {
     return {
       answer: "",
       showError: false,
-      errorMessage: "",
+      errorMessage: ""
     };
   },
   methods: {
@@ -45,14 +48,25 @@ export default {
       this.answer = "";
       this.$emit("cancelEdition");
     },
-    publishAnswer() {
+    async publishAnswer() {
       let data = {
-        content: this.answer,
+        content: this.answer
       };
-      /* console.log("Estoy enviando ->", data); */
-      this.$emit("publishAnswer", data);
-    },
-  },
+      try {
+        const response = await api.newAnswer(this.question.id, data);
+
+        alertFunction(
+          "success",
+          "HAS RESPONDIDO",
+          "Tu respuesta se ha publicado correctamente"
+        );
+        this.$router.push({ name: "UserAnswers" });
+      } catch (error) {
+        this.showError = true;
+        this.errorMessage = error;
+      }
+    }
+  }
 };
 </script>
     

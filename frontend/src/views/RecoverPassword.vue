@@ -51,8 +51,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import { config, ENDPOINT, alertFunction } from "../utils/helpers";
+import api from "@/api/api.js";
+import { alertFunction } from "../utils/helpers";
 
 export default {
   name: "RecoverPasword",
@@ -78,15 +78,12 @@ export default {
           let data = {
             email: this.email,
           };
+          const response = await api.recoverPassword(data);
 
-          const response = await axios.post(
-            ENDPOINT + "/users/recover-password/",
-            data
-          );
           this.showRecoverCode = true;
         } catch (error) {
           this.showError = true;
-          this.errorMessage = error.response.data.message;
+          this.errorMessage = error;
         }
       }
     },
@@ -101,10 +98,8 @@ export default {
             recoverCode: this.recoverCode,
             newPassword: this.newPassConfirm,
           };
-          const response = await axios.post(
-            ENDPOINT + "/users/reset-password",
-            data
-          );
+
+          const response = await api.resetPassword(data);
 
           alertFunction(
             "success",
@@ -114,7 +109,7 @@ export default {
           this.$router.push("/login");
         } catch (error) {
           this.showError = true;
-          this.errorMessage = error.response.data.message;
+          this.errorMessage = error;
         }
       }
     },

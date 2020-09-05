@@ -3,7 +3,7 @@
     <div class="menuContainer">
       <div id="nav">
         <figure @click="activateMenu" class="iconMenu">
-          <img src="../assets/icons/menu-movil.svg" alt="menu hamburguesa" />
+          <img src="../assets/icons/menu-movil.svg" alt="menu hamburguesa">
         </figure>
 
         <figure class="logoMenu">
@@ -11,7 +11,7 @@
             src="../assets/logoTutorshipLigth.svg"
             alt="logo-tutorships"
             @click="$router.push('/')"
-          />
+          >
         </figure>
       </div>
 
@@ -23,7 +23,7 @@
         </h5>
 
         <figure>
-          <img class="avatar" :src="avatar" alt="avatar" @click="$router.push('/perfil')" />
+          <img class="avatar" :src="avatar" alt="avatar" @click="$router.push('/perfil')">
         </figure>
       </div>
     </div>
@@ -59,7 +59,7 @@
     </div>
 
     <main class="main" @click="deactivateMenu">
-      <slot />
+      <slot/>
     </main>
   </div>
 </template>
@@ -71,7 +71,7 @@ import userData from "@/dataStorage/userData";
 export default {
   name: "Dashboard",
   props: {
-    userId: String,
+    userId: String
   },
   data() {
     return {
@@ -80,7 +80,7 @@ export default {
       errorMessage: "",
       //store del usuario
       sharedStore: userData.state,
-      isActive: true,
+      isActive: true
     };
   },
   //computadas
@@ -96,7 +96,7 @@ export default {
     },
     role() {
       return this.sharedStore.role;
-    },
+    }
   },
   methods: {
     logOut() {
@@ -111,8 +111,8 @@ export default {
       if (this.isActive === false) {
         this.isActive = true;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -332,6 +332,9 @@ a#questionButton {
     flex-direction: row;
     justify-content: baseline;
     align-items: center;
+  }
+  .metadataUser {
+    display: none;
   }
 }
 

@@ -69,14 +69,14 @@ export default {
   margin: 3rem;
 }
 #nav {
-  padding: 1.5rem 3rem;
+  padding: 1rem 3rem;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   align-content: flex-start;
-  position: sticky;
   top: 0;
+  background-color: var(--darkColor);
 }
 .logoMenu {
   flex-grow: 1;
@@ -108,12 +108,21 @@ export default {
 }
 
 .responsiveMenu {
-  left: -200px;
+  left: -220px;
 }
 @media only screen and (min-width: 600px) {
 }
 
 @media only screen and (min-width: 800px) {
+  #nav {
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-content: flex-start;
+  }
+
   #button2 {
     margin: 0 2rem;
     /* width: 80px; */

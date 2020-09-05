@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <vue-headful title="Tutorship" description="Página principal de TutorShip" />
     <div class="bannerContainer">
       <span>
         <img id="logoMenu" src="../assets/logoTutorshipLigth.svg" alt="logo-tutorships" />
@@ -12,9 +13,9 @@
     <div class="homeContent">
       <h1>Busca todo lo que necesites:</h1>
       <searchcomponent
-        @queryParams="collectParams"
         :languages="languages"
         :newSearchData="newSearchData"
+        @queryParams="collectParams"
         @newSearch="newSearch"
       />
       <p v-show="searchMessage">Resultado de tu búsqueda</p>
@@ -23,12 +24,9 @@
         v-show="isResult"
         id="questionsBody"
         :questions="questions"
-        :answers="answers"
-        @showAnswers="getAnswersById"
+        :route="route"
         @newVote="newVote"
       />
-
-      <!--     @rateAnswer="rateAnswer" -->
     </div>
 
     <div id="expert" class="bannerContainer">
@@ -79,6 +77,9 @@ export default {
     token() {
       return this.sharedStore.token;
     },
+    route() {
+      return this.$route.name;
+    },
   },
 
   methods: {
@@ -117,36 +118,14 @@ export default {
         }
         console.error(error);
       }
-      //falta trcatch
+    },
 
-      /*   if (response === "No hay resultados que coincidan con tu búsqueda") {
-        this.newSearchData = {
-          response,
-          newSearchView: true,
-        };
-        this.isResult = false;
-      } else {
-        this.searchMessage = false;
-        this.questions = response;
-        await this.getLanguages();
-      } */
-    },
-    //TRAER LAS RESPUESTA DE LA PREGUNTA SELECCIONADA SI ES USUARIO LOGUEADO
-    async getAnswersById(idQuestion) {
-      try {
-        this.answers = await api.getAnswers(idQuestion);
-      } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
-      }
-    },
     //TRAER LOS LENGUAJES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
     async getLanguages() {
       try {
         this.languages = await api.getLanguages();
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
+        console.error(error);
       }
     },
   },
@@ -157,6 +136,9 @@ export default {
 </script>
 
 <style scoped>
+.homeContent {
+  margin: 0 2rem;
+}
 #logoMenu {
   display: none;
 }

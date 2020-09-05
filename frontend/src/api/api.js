@@ -110,15 +110,58 @@ export default {
     return response.data.data;
   },
   //ASOCIAR UN NUEVO LENGUAJE
-  newLanguageExpert: async function(languageId) {
+  newLanguageExpert: async function(data) {
     const response = await authInstance
-      .put("/users/add-language", { newlanguage: languageId })
+      .put("/users/add-language", data)
       .catch((error) => {
         throw error.response.data.message;
       });
     return response.data.data;
   },
+  deleteLanguageExpert: async function(idLanguage) {
+    const response = await authInstance
+      .delete("/users/delete-language/" + idLanguage)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
+  },
+  getUserLanguages: async function() {
+    const response = await authInstance
+      .get("/expert/languages")
+      .catch((error) => {
+        throw error.response.data.message;
+      });
 
+    return response.data.data;
+  },
+  recoverPassword: async function(data) {
+    const response = await authInstance
+      .post("/users/recover-password/", data)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+
+    return response.data.data;
+  },
+  resetPassword: async function(data) {
+    const response = await authInstance
+      .post("/users/reset-password", data)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+
+    return response.data.data;
+  },
+  validateNewUser: async function(code) {
+    const response = await authInstance
+      .get("/users/validate/" + code)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+
+    return response.data.data;
+  },
   ///////////////*  PREGUNTAS  *//////////////////////
   //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD
   getQuestions: async function(queryParams) {
@@ -166,7 +209,7 @@ export default {
     return response.data.data;
   },
   //PREGUNTAS PARA EXPERTO
-  questionsToAnswer: async function() {
+  questionsForExpert: async function() {
     const response = await authInstance
       .get("/questions/to-answer")
       .catch((error) => {
@@ -175,6 +218,38 @@ export default {
     return response.data.data;
   },
   ///////////////*  RESPUESTAS  *//////////////////////
+
+  //traer las repsuestas de un usuario.
+  getAnswers: async function() {
+    const response = await authInstance.get("/answer").catch((error) => {
+      throw error.response.data.message;
+    });
+    return response.data.data;
+  },
+  newAnswer: async function(idQuestion, data) {
+    const response = await authInstance
+      .post("/new-answer/" + idQuestion, data)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
+  },
+  editAnswer: async function(idAnswer, data) {
+    const response = await authInstance
+      .put("/edit-answer/" + idAnswer, data)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
+  },
+  questionToAnswer: async function(idQuestion) {
+    const response = await authInstance
+      .get("/question/" + idQuestion)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
+  },
   //RATE ANSWER
   postRating: async function(data) {
     console.log(data);
@@ -188,10 +263,31 @@ export default {
       });
     return response;
   },
-
-  getAnswers: async function(idQuestion) {
+  deleteAnswer: async function(idAnswer) {
+    const response = await authInstance
+      .delete("/delete-answer/" + idAnswer)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response;
+  },
+  getSingleAnswer: async function(idQuestion) {
     const response = await authInstance
       .get("/answer/" + idQuestion)
+      .catch((error) => {
+        throw error.response.data.message;
+      });
+    return response.data.data;
+  },
+
+  ///////////////*  ADMIN *//////////////////////
+  validateExpert: async function(idUser, role) {
+    const response = await authInstance
+      .post("/users/validate-expert/" + idUser, {
+        headers: {
+          role,
+        },
+      })
       .catch((error) => {
         throw error.response.data.message;
       });

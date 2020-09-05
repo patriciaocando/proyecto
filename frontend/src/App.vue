@@ -39,8 +39,10 @@ export default {
       this.token = token;
       api.setAuthToken(this.token);
       const response = api.getUserTokenId(this.token);
-      this.userId = response.id;
-      this.setData();
+      if (response !== null) {
+        this.userId = response.id;
+        this.setData();
+      }
     }
   },
   methods: {
@@ -48,27 +50,29 @@ export default {
       this.token = token;
       localStorage.setItem("AUTH_TOKEN_KET", this.token);
       const response = await api.getUserTokenId(this.token);
-      this.userId = response.id;
-      this.setData();
+      if (response !== null) {
+        this.userId = response.id;
+        await this.setData();
+      }
     },
 
     async setData() {
       const user = await api.getUserProfile(this.userId);
+      if (user !== null) {
+        console.log(user);
+        this.sharedStore.id = this.userId;
+        this.sharedStore.token = this.token;
+        this.sharedStore.username = user.username;
+        this.sharedStore.role = user.role;
+        this.sharedStore.avatar = process.env.VUE_APP_STATIC + user.avatar;
+        this.sharedStore.email = user.email;
+        this.sharedStore.name = user.name;
+        this.sharedStore.lastname = user.lastName;
+        this.sharedStore.profile = user.profile;
+        this.sharedStore.isLogged = this.isAuthenticated;
 
-      console.log(user);
-
-      this.sharedStore.id = this.userId;
-      this.sharedStore.token = this.token;
-      this.sharedStore.username = user.username;
-      this.sharedStore.role = user.role;
-      this.sharedStore.avatar = process.env.VUE_APP_STATIC + user.avatar;
-      this.sharedStore.email = user.email;
-      this.sharedStore.name = user.name;
-      this.sharedStore.lastname = user.lastName;
-      this.sharedStore.profile = user.profile;
-      this.sharedStore.isLogged = this.isAuthenticated;
-
-      this.$router.push({ name: "Dashboard" });
+        this.$router.push({ name: "Dashboard" });
+      }
     },
     logOut(currentRoute) {
       this.sharedStore.id = null;
@@ -104,7 +108,8 @@ body {
 * {
   margin: 0;
   /*COLORS*/
-  --blue: #337eff;
+  --blue: #0760f9;
+  --darkBlue: #044ac1;
   --ligthBlue: #e6efff;
   --vibrantBLue: #33ddff;
   --ligthColor: #e8e8e8;
@@ -252,7 +257,7 @@ h4 {
 .deleteButton:hover {
   background-image: url("./assets/icons/open-basket.svg");
   background-repeat: no-repeat;
-  background-position: 3% 50%;
+  background-position: 4% 50%;
   background-size: 16px;
   margin: 0;
   padding-left: 2rem;
@@ -292,6 +297,9 @@ button:focus {
   outline: none;
 }
 
+button:hover {
+  background-color: var(--darkBlue);
+}
 .button {
   /*texto*/
   font-size: 0.8rem;
@@ -314,6 +322,10 @@ button:focus {
   color: var(--blue);
 }
 
+#button2:hover {
+  color: var(--textColor);
+}
+
 #button3 {
   color: var(--darkColor);
   background-color: white;
@@ -324,6 +336,11 @@ button:focus {
 .cancelButton {
   background-color: white;
   color: var(--mediumColor);
+}
+
+.cancelButton:hover {
+  background-color: white;
+  color: var(--darkBlue);
 }
 
 .simpleLink {

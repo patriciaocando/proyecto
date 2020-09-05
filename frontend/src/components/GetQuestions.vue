@@ -4,12 +4,12 @@
       <question
         :question="question"
         :route="route"
-        :isUser="isUser"
+        :index="index"
         @editquestion="editQuestionId"
         @showmethsanswer="showmethsanswer"
-        :index="index"
         @questionDeleted="questionDeleted"
         @questionEdited="questionEdited"
+        @getQuestionToAnswer="getQuestionToAnswer"
       />
       <button
         v-if="!isUser"
@@ -18,9 +18,9 @@
       >Regístrate para ver las respuestas</button>
 
       <getanswer
-        v-show="hideAnswer"
         class="answerContent"
-        v-if="index === answer"
+        v-show="hideAnswer"
+        v-if="index === indexAnswer"
         :answers="answers"
         @newVote="newVote"
       />
@@ -31,17 +31,21 @@
 <script>
 import question from "@/components/Question.vue";
 import getanswer from "@/components/GetAnswer.vue";
+import { alertFunction } from "../utils/helpers";
+
 import userData from "@/dataStorage/userData";
 
+import api from "@/api/api.js";
+
 export default {
-  name: "ShowQuestions",
+  name: "GetQuestions",
   components: {
     getanswer,
     question,
   },
   props: {
     questions: Array,
-    answers: Array,
+    //answers: Array
   },
   data() {
     return {
@@ -49,23 +53,27 @@ export default {
       hideAnswer: false,
 
       //Variable para saber el indice de la pregunta de la que se desea ver la respuesta
-      answer: "",
+      indexAnswer: "",
       buttonText: "VER RESPUESTAS",
-
+      answers: [],
       //store del usuario
       sharedStore: userData.state,
     };
   },
   computed: {
-    isUser() {
-      return this.sharedStore.isLogged;
-    },
     route() {
       return this.$route.name;
+    },
+    isUser() {
+      return this.sharedStore.isLogged;
     },
   },
 
   methods: {
+    getQuestionToAnswer(idQuestion) {
+      console.log("desde GetQuestion", idQuestion);
+      this.$emit("getQuestionToAnswer", idQuestion);
+    },
     questionEdited() {
       this.$emit("questionEdited");
     },
@@ -73,15 +81,24 @@ export default {
       this.$emit("questionDeleted");
     },
     newVote(data) {
-      this.$emit("newVote", data);
+      alertFunction(
+        "success",
+        "Ranking",
+        `¡Has Votado con ${data.rating} puntos!`
+      );
     },
     editQuestionId(id) {
       this.$emit("editquestion", id);
     },
-    showmethsanswer({ id, index }) {
-      this.answer = index;
-      this.hideAnswer = !this.hideAnswer;
-      this.$emit("showAnswers", id);
+    async showmethsanswer({ id, index }) {
+      try {
+        this.indexAnswer = index;
+        this.hideAnswer = !this.hideAnswer;
+        this.answers = await api.getAnswers(id);
+      } catch (error) {
+        this.showError = true;
+        this.errorMessage = error;
+      }
     },
   },
 };

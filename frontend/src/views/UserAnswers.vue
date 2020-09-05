@@ -1,14 +1,19 @@
 <template>
   <div class="container">
+    <vue-headful
+      title="Respuestas de experto | TutorShip"
+      description="Página de las respuesta que ha realizado el experto"
+    />
     <span id="sectionTitle">
       <h1>Tus respuestas</h1>
       <h2>Aquí puedes ver las respuestas que has realizado</h2>
     </span>
-    <p v-show="showError">{{ errorMessage }}</p>
-    <answercomponent
+
+    <answer
       :answers="bbddAnswers"
-      v-on:editedAnswer="postEditedAnswer"
-      v-on:deleteAnswer="deleteAnswer"
+      :editAnswer="editAnswer"
+      @editedAnswer="postEditedAnswer"
+      @deleteAnswer="deleteAnswer"
     />
   </div>
 </template>
@@ -16,28 +21,22 @@
 <script>
 //STORAGE DE LOS DATOS DE USUARIO
 import userData from "@/dataStorage/userData";
-import axios from "axios";
-import Swal from "sweetalert2";
-import {
-  getAuthToken,
-  getIdToken,
-  alertFunction,
-  config,
-  ENDPOINT,
-} from "../utils/helpers";
+import { alertFunction } from "../utils/helpers";
 
-import answercomponent from "@/components/AnswerComponent.vue";
+import answer from "@/components/Answer.vue";
+import api from "@/api/api.js";
 
 export default {
   name: "UserAnswers",
   components: {
-    answercomponent,
+    answer,
   },
   data() {
     return {
       //Variable de vista
       bbddAnswers: [],
 
+      editAnswer: false,
       //variables de gestion de errores
       showError: false,
       errorMessage: "",
@@ -46,9 +45,6 @@ export default {
     };
   },
   computed: {
-    token() {
-      return this.sharedStore.token;
-    },
     route() {
       return this.$route.name;
     },
@@ -57,50 +53,37 @@ export default {
     //TRAER RESPUESTAS HECHAS POR EL USUARIO DESDE LA BBDD
     async getAnswers() {
       try {
-        const response = await axios.get(ENDPOINT + "/answer", {
-          headers: {
-            Authorization: this.token,
-          },
-        });
-        this.bbddAnswers = response.data.data;
+        const response = await api.getAnswers();
+        this.bbddAnswers = response;
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
     async postEditedAnswer(componentData) {
       try {
+        let idAnswer = componentData.id;
         let data = {
           content: componentData.currentAnswer,
         };
-
-        const response = await axios.put(
-          ENDPOINT + "/edit-answer/" + componentData.id,
-          data,
-          config
-        );
-
-        alertFunction("success", "Editada!", "Tu respuesta ha sido editada.");
-        //location.reload();
-        await this.getAnswers();
+        const response = await api.editAnswer(idAnswer, data);
+        if (response !== null) {
+          alertFunction("success", "Editada!", "Tu respuesta ha sido editada.");
+          await this.getAnswers();
+        }
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage = error;
       }
     },
     async deleteAnswer(idAnswer) {
       try {
-        const response = await axios.delete(
-          ENDPOINT + "/delete-answer/" + idAnswer,
-          config
-        );
-
-        alertFunction("success", "Borrada!", "Tu respuesta ha sido borrada.");
-
-        location.reload();
+        const response = await api.deleteAnswer(idAnswer);
+        if (response !== null) {
+          alertFunction("success", "Borrada!", "Tu respuesta ha sido borrada.");
+        }
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error.response.data.message;
+        console.error(error);
       }
     },
   },
@@ -111,25 +94,4 @@ export default {
 </script>
 
 <style scoped>
-/* .answersContainer {
-  margin: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  align-content: space-between;
-  background-color: dodgerblue;
-}
-
-@media only screen and (min-width: 600px) {
-}
-@media only screen and (min-width: 1200px) {
-  .dashHomeContent {
-    margin: 2rem;
-    max-width: 65vw;
-  }
-  .answersContainer {
-    margin-bottom: 3rem;
-  }
-} */
 </style>

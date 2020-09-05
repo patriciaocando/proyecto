@@ -1,5 +1,9 @@
 <template>
   <div class="container">
+    <vue-headful
+      title="Perfil de Usuario |  Tutorship"
+      description="Perfil de usuario de TUtorShip"
+    />
     <!--DATOS DE USUARIO-->
 
     <userprofile :currentUser="currentUser" @iduserupdate="updateUserData" :cancel="deleteError" />
@@ -15,13 +19,13 @@
 //STORAGE DE LOS DATOS DE USUARIO
 import userData from "@/dataStorage/userData";
 import api from "@/api/api";
+//utilidades
+import { alertFunction } from "../utils/helpers";
+import { cloneDeep } from "lodash";
 
-import { alertFunction, ENDPOINT } from "../utils/helpers";
-
+//componentes
 import userprofile from "@/components/UserProfile.vue";
 import changepassword from "@/components/ChangePassword.vue";
-
-import { cloneDeep } from "lodash";
 
 export default {
   name: "Profile",
@@ -72,7 +76,6 @@ export default {
 
       try {
         const response = await api.updateUserProfile(this.userId, formData);
-
         const updatedUser = await api.getUserProfile(this.userId);
 
         this.sharedStore.username = updatedUser.username;

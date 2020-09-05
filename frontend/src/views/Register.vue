@@ -59,12 +59,8 @@
 </template>
 
 <script>
-/* import axios from "axios"; */
-import Swal from "sweetalert2";
 import api from "@/api/api";
 import { alertFunction } from "../utils/helpers";
-/* import { alertFunction, ENDPOINT, config } from "../utils/helpers"; */
-
 export default {
   name: "Register",
   data() {

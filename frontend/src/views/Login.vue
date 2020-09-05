@@ -43,11 +43,11 @@ export default {
   data() {
     return {
       email: "patypocando@gmail.com",
-      password: "12345678",
-      /* 
-      email: "tutorshipStudent@gmail.com",
-      password: "12345678", */
+      password: "123456789",
 
+      /*  email: "tutorshipStudent@gmail.com",
+      password: "12345678",
+ */
       showError: false,
       errorMessage: "",
     };

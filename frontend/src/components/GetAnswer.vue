@@ -15,14 +15,14 @@
           </p>
 
           <star-rating
-            :rating="parseInt(answer.rating)"
-            @rating-selected="setRating"
-            @current-rating="setAnswerId(answer.id)"
-            :increment="1"
-            :max-rating="5"
             inactive-color="var(--regularColor)"
             active-color="var(--blue)"
+            :rating="parseInt(answer.rating)"
+            :increment="1"
+            :max-rating="5"
             :star-size="20"
+            @rating-selected="setRating"
+            @current-rating="setAnswerId(answer.id)"
           ></star-rating>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default {
         this.$emit("newVote", data);
       } catch (error) {
         console.log(error);
-        await alertFunction("error", "Opss!", `Ya has votado esta respuesta`);
+        alertFunction("error", "Opss!", `Ya has votado esta respuesta`);
       }
     },
     getImageName(name) {

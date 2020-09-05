@@ -1,15 +1,18 @@
 <template>
-  <div class="activateContainer">
-    <h1>Has activado tu usuario!</h1>
-    <h3>HAZ LOGIN PARA INICIAR SESION</h3>
+  <div>
+    <vue-headful title="Registro | TutorShip" description="Validación de registro en TutorShip" />
+    <div v-show="!showError" class="activateContainer">
+      <h1>Has activado tu usuario!</h1>
+      <h3>HAZ LOGIN PARA INICIAR SESION</h3>
+
+      <router-link class="button" :to="{ name: 'Login' }">Login</router-link>
+    </div>
     <p class="errorMessage" v-show="showError">{{ errorMessage }}</p>
-    <router-link class="button" :to="{ name: 'Login' }">Login</router-link>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { ENDPOINT } from "../utils/helpers";
+import api from "@/api/api.js";
 export default {
   name: "RegisterValidation",
   data() {
@@ -26,12 +29,11 @@ export default {
       console.log(this.$route.params);
 
       try {
-        const response = await axios.get(
-          ENDPOINT + "/users/validate/" + registrationCode[1]
-        );
+        const response = await api.validateNewUser(registrationCode[1]);
       } catch (error) {
         this.showError = true;
-        this.errorMessage = error.response.data.message;
+        this.errorMessage =
+          "Ha habido un error con tu solicitud, ¡vuelve a intentarlo!";
       }
     },
   },
