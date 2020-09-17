@@ -18,8 +18,8 @@ export default {
   name: "App",
   data() {
     return {
-      userId: "",
-      token: "",
+      userId: null,
+      token: null,
       sharedStore: userData.state,
     };
   },
@@ -33,6 +33,7 @@ export default {
     },
   },
   created() {
+    console.log("1");
     let token = localStorage.getItem("AUTH_TOKEN_KET");
 
     if (token !== null) {
@@ -47,17 +48,23 @@ export default {
   },
   methods: {
     async getUserData(token) {
-      this.token = token;
-      localStorage.setItem("AUTH_TOKEN_KET", this.token);
-      const response = await api.getUserTokenId(this.token);
-      if (response !== null) {
-        this.userId = response.id;
-        await this.setData();
+      // let token = localStorage.getItem("AUTH_TOKEN_KET");
+      console.log("2", token);
+
+      if (token !== null) {
+        this.token = token;
+        localStorage.setItem("AUTH_TOKEN_KET", this.token);
+        const response = await api.getUserTokenId(this.token);
+        if (response !== null) {
+          this.userId = response.id;
+          await this.setData();
+        }
       }
     },
 
     async setData() {
       const user = await api.getUserProfile(this.userId);
+      console.log("setData", user);
       if (user !== null) {
         console.log(user);
         this.sharedStore.id = this.userId;
@@ -74,23 +81,26 @@ export default {
         this.$router.push({ name: "Dashboard" });
       }
     },
-    logOut(currentRoute) {
-      this.sharedStore.id = null;
-      this.sharedStore.role = null;
-      this.sharedStore.token = null;
-      this.sharedStore.username = null;
-      this.sharedStore.avatar = null;
-      this.sharedStore.email = null;
-      this.sharedStore.name = null;
-      this.sharedStore.lastname = null;
-      this.sharedStore.profile = null;
-      this.sharedStore.isLogged = false;
-      api.logout();
+    async logOut(currentRoute) {
+      const response = await api.logout();
+      console.log("logout", response);
+      if (response !== null || response !== undefined) {
+        this.token = null;
+        this.userId = null;
+        this.sharedStore.id = null;
+        this.sharedStore.role = null;
+        this.sharedStore.token = null;
+        this.sharedStore.username = null;
+        this.sharedStore.avatar = null;
+        this.sharedStore.email = null;
+        this.sharedStore.name = null;
+        this.sharedStore.lastname = null;
+        this.sharedStore.profile = null;
+        this.sharedStore.isLogged = false;
+      }
 
       if (currentRoute !== "Home") {
         this.$router.push({ name: "Home" });
-      } else {
-        location.reload();
       }
     },
   },

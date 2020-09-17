@@ -42,32 +42,34 @@ export default {
   name: "Login",
   data() {
     return {
-      email: "patypocando@gmail.com",
-      password: "123456789",
+      /* email: "patypocando@gmail.com",
+      password: "123456789", */
 
-      /*  email: "tutorshipStudent@gmail.com",
+      email: "tutorshipStudent@gmail.com",
       password: "12345678",
- */
+
       showError: false,
       errorMessage: "",
     };
   },
   methods: {
-    login() {
+    async login() {
       if (this.email === "" || this.password === "") {
         this.showError = true;
         this.errorMessage = "Debes llenar todos los campos";
       } else {
-        api
+        const response = await api
           .login(this.email, this.password)
-          .then((data) => {
-            console.log("recibo y envio token");
-            this.$emit("doLogin", data);
-          })
           .catch((error) => {
             this.showError = true;
             this.errorMessage = error;
           });
+
+        if (response !== null) {
+          console.log("recibo y envio token");
+          let data = response;
+          this.$emit("doLogin", data);
+        }
       }
     },
     cancelLogin() {

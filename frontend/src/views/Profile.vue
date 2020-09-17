@@ -75,9 +75,10 @@ export default {
       formData.append("avatar", userData.avatar);
 
       try {
-        const response = await api.updateUserProfile(this.userId, formData);
-        const updatedUser = await api.getUserProfile(this.userId);
+        let id = this.userId;
 
+        const response = await api.updateUserProfile(id, formData);
+        const updatedUser = await api.getUserProfile(id);
         this.sharedStore.username = updatedUser.username;
         this.sharedStore.avatar =
           process.env.VUE_APP_STATIC + updatedUser.avatar;

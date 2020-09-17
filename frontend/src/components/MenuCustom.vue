@@ -16,13 +16,15 @@
     </div>
     <div class="navLinks" :class="{'responsiveMenu' : isActive }">
       <router-link :to="{ name: 'Home' }">Inicio</router-link>
-      <router-link :to="{ name: 'About' }">About</router-link>
+      <router-link :to="{ name: 'About' }">Conócenos</router-link>
       <router-link :to="{ name: 'ListExperts' }">Nuestros expertos</router-link>
-      <router-link v-if="isLoged" :to="{ name: 'Dashboard' }">Mi dashboard</router-link>
+
+      <router-link v-if="isLoged" id="dashButton" :to="{ name: 'Dashboard' }">Mi dashboard</router-link>
+
       <router-link v-if="!isLoged" :to="{ name: 'Login' }">Login</router-link>
       <router-link v-if="!isLoged" id="registerButton" :to="{ name: 'Register' }">¡Regístrate!</router-link>
-      <button v-if="isLoged" id="button2" @click="$emit('logout')">Logout</button>
-      <button class="hideMenu light" id="closeMenu" @click="activateMenu()">X CERRAR MENU</button>
+      <button class="hideMenu cancelButton" @click="activateMenu()">X CERRAR MENU</button>
+      <button v-if="isLoged" id="logoutButton" @click="$emit('logout')">Logout</button>
     </div>
   </div>
 </template>
@@ -92,6 +94,9 @@ export default {
   box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.25);
   transition: left 1s;
 }
+.cancelButton {
+  background-color: transparent;
+}
 .navLinks a {
   text-align: left;
   font-weight: bold;
@@ -100,6 +105,18 @@ export default {
   padding: 2rem 1rem;
   border-bottom: 1px solid var(--textColor);
   margin: 0 2rem;
+}
+
+#logoutButton {
+  font-size: 1rem;
+  text-align: left;
+  font-weight: bold;
+  color: var(--ligthColor);
+  text-decoration: none;
+  padding: 2rem 1rem;
+  border-bottom: 1px solid var(--textColor);
+  margin: 0 2rem;
+  background: transparent;
 }
 
 .navLinks button {
@@ -114,6 +131,36 @@ export default {
 }
 
 @media only screen and (min-width: 800px) {
+  #logoutButton {
+    font-size: 1rem;
+    text-align: left;
+    font-weight: bold;
+    color: var(--ligthColor);
+    text-decoration: none;
+    padding: 0;
+    border-bottom: 1px solid var(--textColor);
+    margin: 0;
+    background: none;
+    text-decoration: none;
+    border: none;
+  }
+  a#dashButton {
+    /*texto*/
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06rem;
+    font-weight: var(--semiBold);
+    /*fondo*/
+    border: none;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    background-color: var(--ligthBlue);
+    color: var(--blue);
+  }
+  #logoutButton {
+    margin: 0;
+  }
   #nav {
     padding: 1rem;
     display: flex;

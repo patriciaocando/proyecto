@@ -4,12 +4,7 @@ import jwt from "jwt-decode";
 export const ENDPOINT = "http://localhost:3000";
 
 //instancia
-const authInstance = axios.create({
-  baseURL: ENDPOINT,
-  headers: {
-    Authorization: localStorage.getItem("AUTH_TOKEN_KET"),
-  },
-});
+let authInstance = null;
 
 export default {
   ///////////////*  USUARIOS  *//////////////////////
@@ -21,6 +16,7 @@ export default {
       })
       .then((response) => {
         this.setAuthToken(response.data.data);
+        // localStorage.setItem("AUTH_TOKEN_KET", response.data.data);
         return response.data.data;
       })
       .catch((error) => {
@@ -28,6 +24,12 @@ export default {
       });
   },
   setAuthToken: function(token) {
+    authInstance = axios.create({
+      baseURL: ENDPOINT,
+      headers: {
+        Authorization: token,
+      },
+    });
     authInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   },
   getAuthToken: () => {
@@ -51,8 +53,10 @@ export default {
   },
   //TRAER LA INFO DEL USUARIO
   getUserProfile: async function(id) {
-    const dataUser = await authInstance
-      .get("/users/profile/" + id)
+    const dataUser = await axios
+      .get(ENDPOINT + "/users/profile/" + id, {
+        headers: { Authorization: this.getAuthToken() },
+      })
       .catch((error) => {
         throw error.response.data.message;
       });
@@ -83,7 +87,7 @@ export default {
   },
   ///////////////*  EXPERTOS  *//////////////////////
   getAllExperts: async function() {
-    const response = await authInstance.get("/experts").catch((error) => {
+    const response = await axios.get(ENDPOINT + "/experts").catch((error) => {
       throw error.response.data.message;
     });
     return response.data.data;
@@ -93,7 +97,7 @@ export default {
 
   //TRAER LOS LENGUAJES DE LA BBDD PARA EL SELECTOR DE LA BUSQUEDA AVANZADA
   getLanguages: async function() {
-    const response = await authInstance.get("/languages").catch((error) => {
+    const response = await axios.get(ENDPOINT + "/languages").catch((error) => {
       throw error.response.data.message;
     });
     return response.data.data;
@@ -154,8 +158,8 @@ export default {
     return response.data.data;
   },
   validateNewUser: async function(code) {
-    const response = await authInstance
-      .get("/users/validate/" + code)
+    const response = await axios
+      .get(ENDPOINT + "/users/validate/" + code)
       .catch((error) => {
         throw error.response.data.message;
       });
@@ -165,8 +169,8 @@ export default {
   ///////////////*  PREGUNTAS  *//////////////////////
   //TRAIGO TODAS LAS PREGUNTAS DE LA BBDD
   getQuestions: async function(queryParams) {
-    const response = await authInstance
-      .get("/questions", {
+    const response = await axios
+      .get(ENDPOINT + "/questions", {
         params: queryParams,
       })
       .catch((error) => {

@@ -241,15 +241,16 @@ h1 {
     justify-content: space-evenly;
     align-items: center;
     align-content: flex-start;
-    height: 60vh;
+    min-height: 20vh;
   }
   .bannerContainer span {
-    width: 30vw;
+    width: 35vw;
+    height: 20vh;
+    margin-left: 2rem;
   }
 
   .bannerImage {
-    background-position: right bottom;
-    height: 60vh;
+    min-height: 30vh;
     width: 50vw;
   }
 
@@ -263,8 +264,15 @@ h1 {
     text-align: left;
     line-height: 2rem;
     font-size: 1.5rem;
-    max-width: 30vw;
-    margin-left: 0;
+    max-width: 50vw;
+  }
+
+  #expert {
+    min-height: 30vh;
+  }
+
+  #expert .bannerImage {
+    min-height: 30vh;
   }
 
   #expert .bannerContainer {
@@ -274,12 +282,14 @@ h1 {
     justify-content: space-around;
     align-items: center;
     align-content: flex-start;
-    /* height: 60vh; */
+    min-height: 20vh;
   }
 
   #expert .bannerContainer span {
-    width: 30vw;
+    min-height: 20vh;
+    width: 50vw;
     text-align: left;
+    margin-left: 2rem;
   }
 
   #expert .expertIco {
@@ -287,6 +297,7 @@ h1 {
   }
   #expert #registerButton {
     display: block;
+    left: 0;
   }
 
   .homeContent {

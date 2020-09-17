@@ -106,7 +106,7 @@ export default {
     },
 
     cancelRequest() {
-      this.editAnswer = true;
+      this.editAnswer = false;
     },
   },
 };

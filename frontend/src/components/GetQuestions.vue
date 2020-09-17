@@ -86,6 +86,7 @@ export default {
         "Ranking",
         `¡Has Votado con ${data.rating} puntos!`
       );
+      this.showmethsanswer();
     },
     editQuestionId(id) {
       this.$emit("editquestion", id);
@@ -94,10 +95,10 @@ export default {
       try {
         this.indexAnswer = index;
         this.hideAnswer = !this.hideAnswer;
-        this.answers = await api.getAnswers(id);
+
+        this.answers = await api.getSingleAnswer(id);
       } catch (error) {
-        this.showError = true;
-        this.errorMessage = error;
+        console.error(error);
       }
     },
   },

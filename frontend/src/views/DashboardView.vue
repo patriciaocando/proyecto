@@ -57,6 +57,7 @@ export default {
   },
   data() {
     return {
+      role: "",
       //store del usuario
       sharedStore: userData.state,
       //mensaje de actividad reciente
@@ -77,9 +78,9 @@ export default {
     };
   },
   computed: {
-    role() {
+    /* role() {
       return this.sharedStore.role;
-    },
+    }, */
     token() {
       return this.sharedStore.token;
     },
@@ -89,6 +90,17 @@ export default {
   },
 
   methods: {
+    getRole() {
+      this.role = this.sharedStore.role;
+      console.log(this.role);
+      if (this.role === "estudiante") {
+        this.mesage = "ACTIVIDAD RECIENTE:";
+        this.getStudentQuestions();
+      } else if (this.role === "experto") {
+        this.mesage = "PREGUNTAS PARA RESPONDER:";
+        this.getQuestionsForExpert();
+      }
+    },
     //*BUSQUEDA: DATA PARA EL BOTON DE NUEVA BUSQUEDA
     newSearch() {
       this.searchMessage = false;
@@ -112,18 +124,6 @@ export default {
           this.mesage = "";
         }
         console.error(error);
-      }
-    },
-    async getRole() {
-      console.log(this.role);
-      if (this.role === "estudiante") {
-        this.mesage = "ACTIVIDAD RECIENTE:";
-        await this.getStudentQuestions();
-      } else if (this.role === "experto") {
-        this.mesage = "PREGUNTAS PARA RESPONDER:";
-        this.getQuestionsForExpert();
-      } else {
-        //console.log("carga funcion de admin");
       }
     },
     //*ESTUDIANTE: LAS PREGUNTAS QUE HA HECHO EL ESTUDIANTE RECIENTEMENTE

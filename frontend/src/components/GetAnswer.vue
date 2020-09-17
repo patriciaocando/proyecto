@@ -3,27 +3,29 @@
     <div v-for="answer in answers" :key="answer.id">
       <div class="answrContainer">
         <div class="exepertInfo">
-          <img class="avatar" :src="getImageName(answer.avatarExpert)" />
+          <img class="avatar" :src="getImageName(answer.avatar)" />
           <p>{{ answer.expert }}</p>
         </div>
 
         <p>{{ answer.answer }}</p>
         <div class="metaDataAnswr">
           <p class="accesibilityTxt">
-            {{ answer.respond | getFormat }} | Hace:
+            Respondoda: {{ answer.respond | getFormat }} | Hace:
             {{ answer.respond | getDistance }}
           </p>
-
-          <star-rating
-            inactive-color="var(--regularColor)"
-            active-color="var(--blue)"
-            :rating="parseInt(answer.rating)"
-            :increment="1"
-            :max-rating="5"
-            :star-size="20"
-            @rating-selected="setRating"
-            @current-rating="setAnswerId(answer.id)"
-          ></star-rating>
+          <span>
+            <star-rating
+              inactive-color="var(--regularColor)"
+              active-color="var(--blue)"
+              :rating="parseInt(answer.rating)"
+              :increment="1"
+              :max-rating="5"
+              :star-size="20"
+              @rating-selected="setRating"
+              @current-rating="setAnswerId(answer.id)"
+            ></star-rating>
+            <!-- <p>/ {{answer.total_votes}}</p> -->
+          </span>
         </div>
       </div>
     </div>
@@ -112,5 +114,11 @@ export default {
   }
 }
 @media only screen and (min-width: 1200px) {
+  .metaDataAnswr span {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
 }
 </style>

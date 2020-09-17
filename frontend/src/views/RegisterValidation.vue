@@ -26,8 +26,8 @@ export default {
     async validationUser() {
       let url = window.location.href;
       let registrationCode = url.split("?");
-      console.log(this.$route.params);
-
+      // console.log(this.$route.params);
+      console.log(registrationCode[1]);
       try {
         const response = await api.validateNewUser(registrationCode[1]);
       } catch (error) {

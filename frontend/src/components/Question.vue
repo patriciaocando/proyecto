@@ -3,7 +3,7 @@
     <div class="questionInfo" v-if="!isEdited">
       <div class="autorInfo">
         <span class="autorInfo">
-          <img class="avatar" :src="getImageName(question.avatar)">
+          <img class="avatar" :src="getImageName(question.avatar)" />
           <p>{{ question.name_user }}</p>
         </span>
         <div v-if="route === 'UserQuestions'">
@@ -34,7 +34,7 @@
         </h3>
 
         <!--OPCION SI ES EXPERTO Y SI NO HAY RESPUESTAS MOSTRARSE-->
-        <span class="answer" v-if="isExpert && route ==='Dashboard'">
+        <span class="answer" v-if="isExpert && route ==='Dashboard' && question.answers === 0">
           <h3>NO HAY RESPUESTAS AUN</h3>
           <button @click="getIdQuestionToAnswer(question.id)">RESPONDER</button>
         </span>
@@ -42,8 +42,8 @@
         <!--MOSTRAR LAS RESPUESTAS SI ES USUARIO-->
         <button
           v-show="isUser"
-          v-if="route !== 'UserAnswers' && route !== 'Dashboard' "
-          :class="{ hideButton: question.answers <= 0 }"
+          v-if="route !== 'UserAnswers' && question.answers >0 "
+          :class="{ hideButton: question.answers < 0 }"
           @click="sendQuestionId(question.id)"
         >{{ buttonText }}</button>
       </div>
@@ -51,7 +51,7 @@
     <!--EDITAR PREGUNTA-->
     <div class="questionEdit" v-if="isEdited">
       <h3>TITULO:</h3>
-      <input class="titleInput" type="text" :placeholder="title" v-model="title">
+      <input class="titleInput" type="text" :placeholder="title" v-model="title" />
       <textarea type="text" name="textQuestion" rows="4" :placeholder="content" v-model="content"></textarea>
 
       <div class="buttonsContainer">
@@ -74,7 +74,7 @@ export default {
   props: {
     question: Object,
     route: String,
-    index: Number
+    index: Number,
   },
   data() {
     return {
@@ -87,7 +87,7 @@ export default {
       content: "",
       idQuestion: "",
 
-      isEdited: false
+      isEdited: false,
     };
   },
   computed: {
@@ -96,7 +96,7 @@ export default {
     },
     isExpert() {
       return this.sharedStore.role === "experto";
-    }
+    },
   },
   methods: {
     getImageName(name) {
@@ -105,7 +105,7 @@ export default {
     sendQuestionId(id) {
       let data = {
         id,
-        index: this.index
+        index: this.index,
       };
 
       if (this.buttonText === "OCULTAR RESPUESTAS") {
@@ -131,7 +131,7 @@ export default {
         //DATA
         let data = {
           title: this.title,
-          content: this.content
+          content: this.content,
         };
         const response = await api.editQuestion(idQuestion, data);
         this.isEdited = false;
@@ -152,8 +152,8 @@ export default {
     getIdQuestionToAnswer(idQuestion) {
       console.log("desdeQuestion", idQuestion);
       this.$emit("getQuestionToAnswer", idQuestion);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -188,7 +188,11 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin: 0.5rem 0;
+  margin: 0 0 2rem 0;
+}
+
+.dataMeta .accesibilityTxt {
+  margin: 0;
 }
 
 .autorInfo {
