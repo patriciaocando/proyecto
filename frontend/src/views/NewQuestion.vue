@@ -35,7 +35,13 @@
       >{{ languageQuestion }}</p>
       <h3>Escribe tu pregunta:</h3>
 
-      <textarea name="textQuestion" rows="4" placeholder="Haz tu pregunta" v-model="content"></textarea>
+      <textarea
+        id="newQuestion"
+        name="textQuestion"
+        rows="4"
+        placeholder="Haz tu pregunta"
+        v-model="content"
+      ></textarea>
       <p v-show="showError">{{ errorMessage }}</p>
       <span class="buttonsContainer">
         <button @click="postQuestion()">Publicar</button>
@@ -173,6 +179,15 @@ export default {
 }
 
 @media only screen and (min-width: 1200px) {
+  .titleInput {
+    width: 95%;
+    margin-bottom: 1rem;
+  }
+
+  #newQuestion {
+    width: 95%;
+    height: 13rem;
+  }
   .buttonsContainer {
     display: flex;
     justify-content: flex-end;

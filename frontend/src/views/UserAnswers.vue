@@ -82,6 +82,7 @@ export default {
         if (response !== null) {
           alertFunction("success", "Borrada!", "Tu respuesta ha sido borrada.");
         }
+        await this.getAnswers();
       } catch (error) {
         console.error(error);
       }

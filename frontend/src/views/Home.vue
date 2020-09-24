@@ -287,6 +287,8 @@ h1 {
   }
   #expert #registerButton {
     display: block;
+    left: 0;
+    width: 120px;
   }
 
   .homeContent {
